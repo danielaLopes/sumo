@@ -1,0 +1,30 @@
+# Data files
+*.zip
+*.pickle
+*.backup
+*.o
+*.tfstate
+*.pcap
+*.dat
+*.csv
+*.dat 
+*.pickle
+*.tar.gz
+
+# Some system files
+*__pycache__/
+*.vscode
+*.tfstate
+*.backup
+*.retry
+*.DS_Store
+
+# Notebook Checkpoints
+*.ipynb_checkpoints/
+
+# Specific data files
+*extracted_features*/
+*results*/
+*hyperparameter_tuning/
+*models/
+*full_pipeline_features/
