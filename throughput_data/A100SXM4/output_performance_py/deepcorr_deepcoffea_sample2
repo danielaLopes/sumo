@@ -1,0 +1,13 @@
+Simulating Deep Corr.
+Model occupies 861.860 MB GPU memory
+Disregard the total time shown in tqdm. The purpose of this loop is to get the average only.
+Each training iteration (after warm up) takes on average 0.085594 seconds including moving data between devices, excluding recording the loss or evaluating training accuracy.
+Testing 300 flow pairs takes 0:00:20.041523 including moving data between devices, inference and moving results between devices, excluding data preprocessing and result recording.
+So, for 1000 flow pairs, it will take 0:03:42.683591
+So, a single flow pair takes 0.000223 seconds
+Simulating Deep Coffea, flow length: 500, 800.
+Model anchor occupies 4.430 MB GPU memory
+Model pandn occupies 4.561 MB GPU memory
+Each training iteration (batch size 256, after warm up) takes on average 0.018573 seconds including moving data between devices, excluding recording the loss or evaluating training accuracy.
+Inference loop - each iteration takes on average 0.003145 seconds.
+Testing 1000 flow pairs takes 0:00:00.037012 including moving data between devices, inference, moving results between devices, and compute cosine similarity, excluding data preprocessing and result recording.

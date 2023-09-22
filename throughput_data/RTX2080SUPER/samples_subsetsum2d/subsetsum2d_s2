@@ -1,0 +1,107 @@
+==== Gathering pre-processed data from file...
+==== After pre-processing data
+len(possible_request_combinations): 73437
+correlated_counter: 3568
+
+======================== Delta 60 ========================
+
+============= REPEAT 0 =============
+Nb pairs: 2294
+len(packetListClients): 384010, len(packetListOSes): 384010
+Platform: NVIDIA CUDA
+Device: NVIDIA GeForce RTX 2080 SUPER
+Device: NVIDIA GeForce RTX 2080 SUPER
+Chosen device: NVIDIA GeForce RTX 2080 SUPER
+wholeLoopSubsetSum: nPairs=2294 total_buckets=384010 total_windows=381716 delta=60 buckets_per_window=2
+  ==== EXECUTION TIME: 0.46386122703552246
+total_subsetsum_time 0.44596004486083984
+============= REPEAT 1 =============
+Nb pairs: 4589
+len(packetListClients): 783739, len(packetListOSes): 783739
+Platform: NVIDIA CUDA
+Device: NVIDIA GeForce RTX 2080 SUPER
+Device: NVIDIA GeForce RTX 2080 SUPER
+Chosen device: NVIDIA GeForce RTX 2080 SUPER
+wholeLoopSubsetSum: nPairs=4589 total_buckets=783739 total_windows=779150 delta=60 buckets_per_window=2
+  ==== EXECUTION TIME: 0.4995255470275879
+total_subsetsum_time 0.472470760345459
+============= REPEAT 2 =============
+Nb pairs: 9179
+len(packetListClients): 1566663, len(packetListOSes): 1566663
+Platform: NVIDIA CUDA
+Device: NVIDIA GeForce RTX 2080 SUPER
+Device: NVIDIA GeForce RTX 2080 SUPER
+Chosen device: NVIDIA GeForce RTX 2080 SUPER
+wholeLoopSubsetSum: nPairs=9179 total_buckets=1566663 total_windows=1557484 delta=60 buckets_per_window=2
+  ==== EXECUTION TIME: 0.7629349231719971
+total_subsetsum_time 0.7223501205444336
+============= REPEAT 3 =============
+Nb pairs: 18359
+len(packetListClients): 3124212, len(packetListOSes): 3124212
+Platform: NVIDIA CUDA
+Device: NVIDIA GeForce RTX 2080 SUPER
+Device: NVIDIA GeForce RTX 2080 SUPER
+Chosen device: NVIDIA GeForce RTX 2080 SUPER
+wholeLoopSubsetSum: nPairs=18359 total_buckets=3124212 total_windows=3105853 delta=60 buckets_per_window=2
+  ==== EXECUTION TIME: 1.3791818618774414
+total_subsetsum_time 1.2933638095855713
+============= REPEAT 4 =============
+Nb pairs: 36718
+len(packetListClients): 6269893, len(packetListOSes): 6269893
+Platform: NVIDIA CUDA
+Device: NVIDIA GeForce RTX 2080 SUPER
+Device: NVIDIA GeForce RTX 2080 SUPER
+Chosen device: NVIDIA GeForce RTX 2080 SUPER
+wholeLoopSubsetSum: nPairs=36718 total_buckets=6269893 total_windows=6233175 delta=60 buckets_per_window=2
+  ==== EXECUTION TIME: 2.5445759296417236
+total_subsetsum_time 2.421945095062256
+============= REPEAT 5 =============
+Nb pairs: 73437
+len(packetListClients): 12613920, len(packetListOSes): 12613920
+Platform: NVIDIA CUDA
+Device: NVIDIA GeForce RTX 2080 SUPER
+Device: NVIDIA GeForce RTX 2080 SUPER
+Chosen device: NVIDIA GeForce RTX 2080 SUPER
+wholeLoopSubsetSum: nPairs=73437 total_buckets=12613920 total_windows=12540483 delta=60 buckets_per_window=2
+  ==== EXECUTION TIME: 4.886432886123657
+total_subsetsum_time 4.593397855758667
+============= REPEAT 6 =============
+Nb pairs: 146874
+len(packetListClients): 25227840, len(packetListOSes): 25227840
+Platform: NVIDIA CUDA
+Device: NVIDIA GeForce RTX 2080 SUPER
+Device: NVIDIA GeForce RTX 2080 SUPER
+Chosen device: NVIDIA GeForce RTX 2080 SUPER
+wholeLoopSubsetSum: nPairs=146874 total_buckets=25227840 total_windows=25080966 delta=60 buckets_per_window=2
+  ==== EXECUTION TIME: 9.521885395050049
+total_subsetsum_time 8.954771757125854
+============= REPEAT 7 =============
+Nb pairs: 220311
+len(packetListClients): 37841760, len(packetListOSes): 37841760
+Platform: NVIDIA CUDA
+Device: NVIDIA GeForce RTX 2080 SUPER
+Device: NVIDIA GeForce RTX 2080 SUPER
+Chosen device: NVIDIA GeForce RTX 2080 SUPER
+wholeLoopSubsetSum: nPairs=220311 total_buckets=37841760 total_windows=37621449 delta=60 buckets_per_window=2
+  ==== EXECUTION TIME: 13.84310007095337
+total_subsetsum_time 13.32761263847351
+============= REPEAT 8 =============
+Nb pairs: 293748
+len(packetListClients): 50455680, len(packetListOSes): 50455680
+Platform: NVIDIA CUDA
+Device: NVIDIA GeForce RTX 2080 SUPER
+Device: NVIDIA GeForce RTX 2080 SUPER
+Chosen device: NVIDIA GeForce RTX 2080 SUPER
+wholeLoopSubsetSum: nPairs=293748 total_buckets=50455680 total_windows=50161932 delta=60 buckets_per_window=2
+  ==== EXECUTION TIME: 17.88771963119507
+total_subsetsum_time 17.286396503448486
+============= REPEAT 9 =============
+Nb pairs: 367185
+len(packetListClients): 63069600, len(packetListOSes): 63069600
+Platform: NVIDIA CUDA
+Device: NVIDIA GeForce RTX 2080 SUPER
+Device: NVIDIA GeForce RTX 2080 SUPER
+Chosen device: NVIDIA GeForce RTX 2080 SUPER
+wholeLoopSubsetSum: nPairs=367185 total_buckets=63069600 total_windows=62702415 delta=60 buckets_per_window=2
+  ==== EXECUTION TIME: 21.90114164352417
+total_subsetsum_time 21.425195693969727

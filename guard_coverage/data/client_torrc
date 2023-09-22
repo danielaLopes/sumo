@@ -1,0 +1,7 @@
+SocksPort 9050
+CookieAuthentication 1 # enable cookie-based authentication for the control port
+CookieAuthFileGroupReadable 1 # This allows the authentication cookie file to be group-readable, which can be useful if you're accessing the control port from a different user.
+# Force guard change
+UseEntryGuards 0
+DataDirectory ./tor_client
+ControlPort 9061

@@ -1,0 +1,50 @@
+Simulating Deep Coffea, flow length: 500, 800.
+Model anchor occupies 4.430 MB GPU memory
+Model pandn occupies 4.561 MB GPU memory
+[01/20] training takes 1.304960 seconds
+[02/20] training takes 0.033229 seconds
+[03/20] training takes 0.031490 seconds
+[04/20] training takes 0.031328 seconds
+[05/20] training takes 0.031245 seconds
+[06/20] training takes 0.038043 seconds
+[07/20] training takes 0.037145 seconds
+[08/20] training takes 0.038017 seconds
+[09/20] training takes 0.040481 seconds
+[10/20] training takes 0.041832 seconds
+[11/20] training takes 0.041763 seconds
+[12/20] training takes 0.041778 seconds
+[13/20] training takes 0.041802 seconds
+[14/20] training takes 0.041993 seconds
+[15/20] training takes 0.041722 seconds
+[16/20] training takes 0.041799 seconds
+[17/20] training takes 0.041787 seconds
+[18/20] training takes 0.041834 seconds
+[19/20] training takes 0.041787 seconds
+[20/20] training takes 0.041742 seconds
+
+- Each training iteration (batch size 256, after warm up) takes on average 0.039310 seconds
+
+[01/20] testing takes 0.004187 seconds
+[02/20] testing takes 0.004641 seconds
+[03/20] testing takes 0.004537 seconds
+[04/20] testing takes 0.004211 seconds
+[05/20] testing takes 0.004193 seconds
+[06/20] testing takes 0.004195 seconds
+[07/20] testing takes 0.004201 seconds
+[08/20] testing takes 0.004759 seconds
+[09/20] testing takes 0.004649 seconds
+[10/20] testing takes 0.004235 seconds
+[11/20] testing takes 0.004206 seconds
+[12/20] testing takes 0.004223 seconds
+[13/20] testing takes 0.004212 seconds
+[14/20] testing takes 0.004218 seconds
+[15/20] testing takes 0.004220 seconds
+[16/20] testing takes 0.004219 seconds
+[17/20] testing takes 0.004208 seconds
+[18/20] testing takes 0.004198 seconds
+[19/20] testing takes 0.004213 seconds
+[20/20] testing takes 0.004228 seconds
+
+- Each testing iteration (batch size 256) takes on average 0.004298 seconds
+
+* These numbers are WITHOUT the final cosine similarity step.

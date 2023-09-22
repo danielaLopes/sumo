@@ -1,0 +1,31 @@
+==== Gathering pre-processed data from file...
+==== After pre-processing data
+len(possible_request_combinations): 73437
+correlated_counter: 3568
+
+======================== Delta 60 ========================
+
+============= REPEAT 0 =============
+Nb pairs: 2294
+len(packetListClients): 384010, len(packetListOSes): 384010
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=2294 total_buckets=384010 total_windows=381716 delta=60 buckets_per_window=2
+
+Nb pairs: 1101555
+len(packetListClients): 189208800, len(packetListOSes): 189208800
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=1101555 total_buckets=189208800 total_windows=188107245 delta=60 buckets_per_window=2
+Exec time subsetsum2d: 1.650880s
+  ==== EXECUTION TIME: 36.93963670730591
+total_subsetsum_time 36.51939582824707
+

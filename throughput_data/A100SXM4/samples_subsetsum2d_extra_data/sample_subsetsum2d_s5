@@ -1,0 +1,287 @@
+==== Gathering pre-processed data from file...
+==== After pre-processing data
+len(possible_request_combinations): 73437
+correlated_counter: 3568
+
+======================== Delta 60 ========================
+
+============= REPEAT 0 =============
+Nb pairs: 573
+len(packetListClients): 97458, len(packetListOSes): 97458
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=573 total_buckets=97458 total_windows=96885 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000006s
+Exec time subsetsum2d: 0.001168s
+  ==== EXECUTION TIME: 1.3247275352478027
+total_subsetsum_time 1.3226892948150635
+============= REPEAT 1 =============
+Nb pairs: 1147
+len(packetListClients): 189894, len(packetListOSes): 189894
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=1147 total_buckets=189894 total_windows=188747 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000005s
+Exec time subsetsum2d: 0.001896s
+  ==== EXECUTION TIME: 0.30704760551452637
+total_subsetsum_time 0.3042466640472412
+============= REPEAT 2 =============
+Nb pairs: 2294
+len(packetListClients): 384010, len(packetListOSes): 384010
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=2294 total_buckets=384010 total_windows=381716 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000008s
+Exec time subsetsum2d: 0.003962s
+  ==== EXECUTION TIME: 0.34613466262817383
+total_subsetsum_time 0.3392500877380371
+============= REPEAT 3 =============
+Nb pairs: 4589
+len(packetListClients): 783739, len(packetListOSes): 783739
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=4589 total_buckets=783739 total_windows=779150 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000006s
+Exec time subsetsum2d: 0.006483s
+  ==== EXECUTION TIME: 0.4238090515136719
+total_subsetsum_time 0.41251444816589355
+============= REPEAT 4 =============
+Nb pairs: 9179
+len(packetListClients): 1566663, len(packetListOSes): 1566663
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=9179 total_buckets=1566663 total_windows=1557484 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000007s
+Exec time subsetsum2d: 0.012451s
+  ==== EXECUTION TIME: 0.5765721797943115
+total_subsetsum_time 0.5593080520629883
+============= REPEAT 5 =============
+Nb pairs: 18359
+len(packetListClients): 3124212, len(packetListOSes): 3124212
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=18359 total_buckets=3124212 total_windows=3105853 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000010s
+Exec time subsetsum2d: 0.024491s
+  ==== EXECUTION TIME: 0.8857743740081787
+total_subsetsum_time 0.8463423252105713
+============= REPEAT 6 =============
+Nb pairs: 36718
+len(packetListClients): 6269893, len(packetListOSes): 6269893
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=36718 total_buckets=6269893 total_windows=6233175 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000014s
+Exec time subsetsum2d: 0.060534s
+  ==== EXECUTION TIME: 1.5681030750274658
+total_subsetsum_time 1.4938452243804932
+============= REPEAT 7 =============
+Nb pairs: 73437
+len(packetListClients): 12613920, len(packetListOSes): 12613920
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=73437 total_buckets=12613920 total_windows=12540483 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000023s
+Exec time subsetsum2d: 0.128765s
+  ==== EXECUTION TIME: 2.903412342071533
+total_subsetsum_time 2.7472426891326904
+============= REPEAT 8 =============
+Nb pairs: 146874
+len(packetListClients): 25227840, len(packetListOSes): 25227840
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=146874 total_buckets=25227840 total_windows=25080966 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000045s
+Exec time subsetsum2d: 0.232282s
+  ==== EXECUTION TIME: 5.345716714859009
+total_subsetsum_time 5.064641237258911
+============= REPEAT 9 =============
+Nb pairs: 220311
+len(packetListClients): 37841760, len(packetListOSes): 37841760
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=220311 total_buckets=37841760 total_windows=37621449 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000066s
+Exec time subsetsum2d: 0.343323s
+  ==== EXECUTION TIME: 7.789824962615967
+total_subsetsum_time 7.478987455368042
+============= REPEAT 10 =============
+Nb pairs: 293748
+len(packetListClients): 50455680, len(packetListOSes): 50455680
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=293748 total_buckets=50455680 total_windows=50161932 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000086s
+Exec time subsetsum2d: 0.458962s
+  ==== EXECUTION TIME: 10.604477405548096
+total_subsetsum_time 10.322841167449951
+============= REPEAT 11 =============
+Nb pairs: 367185
+len(packetListClients): 63069600, len(packetListOSes): 63069600
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=367185 total_buckets=63069600 total_windows=62702415 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000108s
+Exec time subsetsum2d: 0.554211s
+  ==== EXECUTION TIME: 13.209230184555054
+total_subsetsum_time 12.872852802276611
+============= REPEAT 12 =============
+Nb pairs: 440622
+len(packetListClients): 75683520, len(packetListOSes): 75683520
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=440622 total_buckets=75683520 total_windows=75242898 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000120s
+Exec time subsetsum2d: 0.636176s
+  ==== EXECUTION TIME: 14.926531314849854
+total_subsetsum_time 14.634439706802368
+============= REPEAT 13 =============
+Nb pairs: 514059
+len(packetListClients): 88297440, len(packetListOSes): 88297440
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=514059 total_buckets=88297440 total_windows=87783381 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000145s
+Exec time subsetsum2d: 0.733769s
+  ==== EXECUTION TIME: 17.339301109313965
+total_subsetsum_time 17.03129553794861
+============= REPEAT 14 =============
+Nb pairs: 587496
+len(packetListClients): 100911360, len(packetListOSes): 100911360
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=587496 total_buckets=100911360 total_windows=100323864 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000148s
+Exec time subsetsum2d: 0.828597s
+  ==== EXECUTION TIME: 19.745028734207153
+total_subsetsum_time 19.38723373413086
+============= REPEAT 15 =============
+Nb pairs: 660933
+len(packetListClients): 113525280, len(packetListOSes): 113525280
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=660933 total_buckets=113525280 total_windows=112864347 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000192s
+Exec time subsetsum2d: 0.941526s
+  ==== EXECUTION TIME: 22.201635122299194
+total_subsetsum_time 21.878175258636475
+============= REPEAT 16 =============
+Nb pairs: 734370
+len(packetListClients): 126139200, len(packetListOSes): 126139200
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=734370 total_buckets=126139200 total_windows=125404830 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000195s
+Exec time subsetsum2d: 1.050378s
+  ==== EXECUTION TIME: 25.00859761238098
+total_subsetsum_time 24.636798620224
+============= REPEAT 17 =============
+Nb pairs: 807807
+len(packetListClients): 138753120, len(packetListOSes): 138753120
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=807807 total_buckets=138753120 total_windows=137945313 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000208s
+Exec time subsetsum2d: 1.132772s
+  ==== EXECUTION TIME: 26.816736698150635
+total_subsetsum_time 26.435961723327637
+============= REPEAT 18 =============
+Nb pairs: 881244
+len(packetListClients): 151367040, len(packetListOSes): 151367040
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=881244 total_buckets=151367040 total_windows=150485796 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000222s
+Exec time subsetsum2d: 1.229596s
+  ==== EXECUTION TIME: 29.368229150772095
+total_subsetsum_time 28.968498706817627
+============= REPEAT 19 =============
+Nb pairs: 954681
+len(packetListClients): 163980960, len(packetListOSes): 163980960
+Platform: NVIDIA CUDA
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Device: NVIDIA A100-SXM4-40GB
+Chosen device: NVIDIA A100-SXM4-40GB
+wholeLoopSubsetSum: nPairs=954681 total_buckets=163980960 total_windows=163026279 delta=60 buckets_per_window=2
+Pre-proc  subsetsum2d: 0.000262s
+Exec time subsetsum2d: 1.327783s
+  ==== EXECUTION TIME: 32.336196184158325
+total_subsetsum_time 31.927435874938965

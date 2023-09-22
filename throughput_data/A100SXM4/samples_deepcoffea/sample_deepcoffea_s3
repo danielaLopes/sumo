@@ -1,0 +1,58 @@
+
+pairs: 100, n wins: 11
+time: 0.0604s
+(each window) tdurs_inference: 0.0048s
+(each window) tdurs_cosine_sim: 0.0007s
+pairs: 200, n wins: 11
+time: 0.1218s
+(each window) tdurs_inference: 0.0100s
+(each window) tdurs_cosine_sim: 0.0011s
+pairs: 300, n wins: 11
+time: 0.1777s
+(each window) tdurs_inference: 0.0149s
+(each window) tdurs_cosine_sim: 0.0012s
+pairs: 500, n wins: 11
+time: 0.2567s
+(each window) tdurs_inference: 0.0216s
+(each window) tdurs_cosine_sim: 0.0017s
+pairs: 1000, n wins: 11
+time: 0.4974s
+(each window) tdurs_inference: 0.0421s
+(each window) tdurs_cosine_sim: 0.0031s
+pairs: 5000, n wins: 11
+time: 1.9560s
+(each window) tdurs_inference: 0.1531s
+(each window) tdurs_cosine_sim: 0.0247s
+pairs: 10000, n wins: 11
+time: 3.9165s
+(each window) tdurs_inference: 0.2909s
+(each window) tdurs_cosine_sim: 0.0651s
+pairs: 15000, n wins: 11
+time: 5.9246s
+(each window) tdurs_inference: 0.4328s
+(each window) tdurs_cosine_sim: 0.1058s
+pairs: 20000, n wins: 11
+time: 8.1595s
+(each window) tdurs_inference: 0.5761s
+(each window) tdurs_cosine_sim: 0.1657s
+pairs: 25000, n wins: 11
+time: 10.3353s
+(each window) tdurs_inference: 0.7197s
+(each window) tdurs_cosine_sim: 0.2199s
+pairs: 30000, n wins: 11
+time: 12.7729s
+(each window) tdurs_inference: 0.8617s
+(each window) tdurs_cosine_sim: 0.2995s
+pairs: 40000, n wins: 11
+time: 17.9069s
+(each window) tdurs_inference: 1.1492s
+(each window) tdurs_cosine_sim: 0.4787s
+pairs: 50000, n wins: 11
+time: 23.7886s
+(each window) tdurs_inference: 1.4490s
+(each window) tdurs_cosine_sim: 0.7136s
+pairs: 60000, n wins: 11
+time: 30.2251s
+(each window) tdurs_inference: 1.7397s
+(each window) tdurs_cosine_sim: 1.0080s
+

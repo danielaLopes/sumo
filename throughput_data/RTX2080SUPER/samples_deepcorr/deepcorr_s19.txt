@@ -1,0 +1,79 @@
+Simulating Deep Corr, flow length = 300.
+Model occupies 861.860 MB GPU memory
+[01/35] training takes 2.016433 seconds
+[02/35] training takes 0.257226 seconds
+[03/35] training takes 1.222734 seconds
+[04/35] training takes 0.004112 seconds
+[05/35] training takes 0.004707 seconds
+[06/35] training takes 0.003569 seconds
+[07/35] training takes 0.003487 seconds
+[08/35] training takes 0.005523 seconds
+[09/35] training takes 0.009163 seconds
+[10/35] training takes 0.004789 seconds
+[11/35] training takes 0.004690 seconds
+[12/35] training takes 0.004771 seconds
+[13/35] training takes 0.004700 seconds
+[14/35] training takes 0.004706 seconds
+[15/35] training takes 0.005354 seconds
+[16/35] training takes 0.004884 seconds
+[17/35] training takes 0.004701 seconds
+[18/35] training takes 0.004753 seconds
+[19/35] training takes 0.004705 seconds
+[20/35] training takes 0.004684 seconds
+[21/35] training takes 0.004681 seconds
+[22/35] training takes 0.005276 seconds
+[23/35] training takes 0.004823 seconds
+[24/35] training takes 0.005916 seconds
+[25/35] training takes 0.004688 seconds
+[26/35] training takes 0.004678 seconds
+[27/35] training takes 0.004670 seconds
+[28/35] training takes 0.004701 seconds
+[29/35] training takes 0.004671 seconds
+[30/35] training takes 0.004698 seconds
+[31/35] training takes 0.004746 seconds
+[32/35] training takes 0.005168 seconds
+[33/35] training takes 0.004805 seconds
+[34/35] training takes 0.004817 seconds
+[35/35] training takes 0.005767 seconds
+
+- Each training iteration (batch size 150, after warm up) takes on average 0.041822 seconds
+
+[01/35] testing takes 0.000664 seconds
+[02/35] testing takes 0.000629 seconds
+[03/35] testing takes 0.000627 seconds
+[04/35] testing takes 0.000648 seconds
+[05/35] testing takes 0.000626 seconds
+[06/35] testing takes 0.000625 seconds
+[07/35] testing takes 0.000628 seconds
+[08/35] testing takes 0.000625 seconds
+[09/35] testing takes 0.000625 seconds
+[10/35] testing takes 0.000622 seconds
+[11/35] testing takes 0.000643 seconds
+[12/35] testing takes 0.000629 seconds
+[13/35] testing takes 0.000632 seconds
+[14/35] testing takes 0.000628 seconds
+[15/35] testing takes 0.000628 seconds
+[16/35] testing takes 0.000634 seconds
+[17/35] testing takes 0.000625 seconds
+[18/35] testing takes 0.000658 seconds
+[19/35] testing takes 0.000628 seconds
+[20/35] testing takes 0.000626 seconds
+[21/35] testing takes 0.000625 seconds
+[22/35] testing takes 0.000624 seconds
+[23/35] testing takes 0.000625 seconds
+[24/35] testing takes 0.000656 seconds
+[25/35] testing takes 0.000625 seconds
+[26/35] testing takes 0.000622 seconds
+[27/35] testing takes 0.000632 seconds
+[28/35] testing takes 0.000632 seconds
+[29/35] testing takes 0.000623 seconds
+[30/35] testing takes 0.000623 seconds
+[31/35] testing takes 0.000686 seconds
+[32/35] testing takes 0.000624 seconds
+[33/35] testing takes 0.000626 seconds
+[34/35] testing takes 0.000623 seconds
+[35/35] testing takes 0.000627 seconds
+
+- Each testing iteration (batch size 150) takes on average 0.000632 seconds
+
+* These numbers are WITHOUT the final cosine similarity step.
