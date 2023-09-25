@@ -208,7 +208,8 @@ def partial_coverage_by_eu_country(dataset_name: str):
 @app.command()
 def hyperparameter_tuning(dataset_folder_validate: str, dataset_folder_test: str):
     """
-    Tune session correlation hyperparameters without filtering phase.
+    Tune session correlation hyperparameters without filtering phase
+    using bayesian optimization.
 
     Args:
         dataset_folder_validate (str): The path to the validation features.

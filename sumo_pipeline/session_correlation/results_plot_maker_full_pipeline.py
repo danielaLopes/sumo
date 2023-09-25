@@ -7,13 +7,12 @@ from mycolorpy import colorlist as mcp
 import pickle
 import sys
 
+from constants import *
+
 
 np.set_printoptions(threshold=sys.maxsize)
 np.set_printoptions(suppress=True)
 
-
-
-BASE_DIR = 'results/figures/'
 
 RED = '#d7261b'
 ORANGE = '#fdae60'
@@ -40,7 +39,7 @@ plt.rcParams['axes.xmargin'] = 0
 plt.rcParams['axes.ymargin'] = 0
 
 
-def precision_recall_variation_with_duration_full_pipeline(min_session_durations, dataset_name):  
+def precision_recall_variation_with_duration_full_pipeline(min_session_durations, dataset_name) -> None:  
     plt.rcParams['figure.figsize'] = (24,7)
 
     precision_color = 'tab:blue'
@@ -85,16 +84,12 @@ def precision_recall_variation_with_duration_full_pipeline(min_session_durations
 
     plt.tight_layout()
 
-    plt.savefig('{}precision_recall_variation_with_duration_full_pipeline_{}.png'.format(BASE_DIR, dataset_name))
-    plt.savefig('{}precision_recall_variation_with_duration_full_pipeline_{}.pdf'.format(BASE_DIR, dataset_name))
+    plt.savefig('{}precision_recall_variation_with_duration_full_pipeline_{}.png'.format(FIGURES_FULL_PIPELINE_RESULTS_FOLDER, dataset_name))
+    plt.savefig('{}precision_recall_variation_with_duration_full_pipeline_{}.pdf'.format(FIGURES_FULL_PIPELINE_RESULTS_FOLDER, dataset_name))
     plt.clf()
 
 
-def precision_recall_variation_with_duration_full_pipeline_table(min_session_durations, dataset_name):  
-    
-    y_axis_precision = []
-    y_axis_recall = []
-
+def precision_recall_variation_with_duration_full_pipeline_table(min_session_durations, dataset_name) -> None:  
     print("\n\n\\begin{table}[t] \n    \
             \\footnotesize \n   \
             \\addtolength{\\tabcolsep}{0.18em} \n    \
