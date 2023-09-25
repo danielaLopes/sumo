@@ -282,7 +282,7 @@ class PreProcessedFullPipelineState(State):
     
     def plot(self) -> None:
         super().plot()
-        results_plot_maker.precision_recall_curve_with_threshold_multiple_session_durations(FIGURES_RESULTS_FOLDER, self.results_by_min_duration, self.flow_count_by_duration_correlated, self.sss.dataset_name)
+        results_plot_maker.precision_recall_curve_with_threshold_multiple_session_durations(FIGURES_FULL_PIPELINE_RESULTS_FOLDER, self.results_by_min_duration, self.flow_count_by_duration_correlated, self.sss.dataset_name)
     
 class PreProcessedPartialCoveragePercentageState(State):
     coverage: float

@@ -525,7 +525,7 @@ def get_sessions_per_os(dataset_name):
 
 
 def session_dataset_statistics(figures_results_folder, data_folder, dataset_name):
-    fig, (ax1, ax2, ax3) = plt.subplots(ncols=3, sharey=True)
+    fig, (ax1, ax2, ax3) = plt.subplots(ncols=3, sharey=True, figsize=(40, 18))
     axis_labels_size = 58
     axis_ticks_size = 54
     linewidth = 8

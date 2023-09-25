@@ -53,13 +53,13 @@ def store_model(model, X_train, save_file_name):
 
 class HyperparameterTuning:
 
-    def __init__(self, plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, statsFileTest):
+    def __init__(self, plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, stats_file_test):
         print("\n=== Gathering training dataset ...")
-        self.X_train, self.y_train = gatherDataset(plFileTrain, statsFileTrain)
+        self.X_train, self.y_train = gather_dataset(statsFileTrain)
         print("\n=== Gathering validation dataset ...")
-        self.X_validate, self.y_validate = gatherDataset(plFileValidate, statsFileValidate)
+        self.X_validate, self.y_validate = gather_dataset(statsFileValidate)
         print("\n=== Gathering testing dataset ...")
-        self.X_test, self.y_test = gatherDataset(plFileTest, statsFileTest)
+        self.X_test, self.y_test = gather_dataset(stats_file_test)
 
     def search_method(self):
         pass
@@ -106,7 +106,7 @@ class HyperparameterTuning:
         print("\n=== Stored hyperparameter tuning model")
 
         probas_ = opt_model.predict_proba(self.X_test)
-        plot_precision_recall_curve(self.y_test, probas_, isValidation=True)
+        plot_precision_recall_curve(self.y_test, probas_, is_validation=True)
 
 
 class BayesianOptimization(HyperparameterTuning):
@@ -219,7 +219,7 @@ def get_tpr_fpr_threshold_preds(probabilities, y_test, threshold=THRESHOLD):
     return threshold_vector
 
 
-def plot_precision_recall_curve_zoomin(plFileTest, statsFileTest, model_save_file, results_file):
+def plot_precision_recall_curve_zoomin(stats_file_test, model_save_file, results_file):
     
     if os.path.isfile(models_folder+model_save_file):
         print("Gathering trained model ...")
@@ -230,7 +230,7 @@ def plot_precision_recall_curve_zoomin(plFileTest, statsFileTest, model_save_fil
         exit()
 
     print("Gathering testing dataset ...")
-    X_test , y_test = gatherDataset(plFileTest, statsFileTest)
+    X_test , y_test = gather_dataset(stats_file_test)
 
     # Predicts the probability of each element to belong to a determined class
     probas_ = model.predict_proba(X_test)
@@ -239,28 +239,22 @@ def plot_precision_recall_curve_zoomin(plFileTest, statsFileTest, model_save_fil
     
     precision, recall, thresholds = precision_recall_curve(y_test, probas_[:, 1])
 
-    for i, p in enumerate(precision):
-        if round(p, 2) == 0.99:
-            print("Precision: {}; recall: {}".format(p, recall[i]))
+    # for i, p in enumerate(precision):
+    #     if round(p, 2) == 0.99:
+    #         print("Precision: {}; recall: {}".format(p, recall[i]))
 
-    for i, r in enumerate(recall):
-        if round(r, 2) == 0.99:
-            print("xxx Precision: {}; recall: {}".format(precision[i], r))
+    # for i, r in enumerate(recall):
+    #     if round(r, 2) == 0.99:
+    #         print("xxx Precision: {}; recall: {}".format(precision[i], r))
 
     plt.plot(np.insert(recall, 0, recall[0]), np.insert(precision, 0, 0), linewidth=4, color="tab:orange", zorder=0)
     plt.ylabel("Precision")
     plt.xlabel("Recall")
     plt.ylim(0.49, 1.01)
     plt.xlim(0, 1.01)
-    #ax2.set_ylim(0.89, 1.01)
-    #ax2.set_xlim(0.89, 1.01)
     plt.xticks([0, 0.2, 0.4, 0.6, 0.8, 1], ["0", "0.2", "0.4", "0.6", "0.8", "1"])
     plt.yticks([0.5, 0.6, 0.7, 0.8, 0.9, 1], ["0.5", "0.6", "0.7", "0.8", "0.9", "1"])
-    #ax2.set_yticks([0.90, 0.95, 1], [0.90, 0.95, 1])
-    #ax2.set_yticks([0.90, 0.95, 1], [0.90, 0.95, 1])
 
-    #axins = zoomed_inset_axes(ax1, zoom=2, loc="upper right")
-    #axins = inset_axes(ax1, width="10%", height="10%", loc="upper right")
     axins = ax1.inset_axes([0.1, 0.1, 0.80, 0.80])
     axins.spines[['right', 'top']].set_visible(True)
     axins.plot(np.insert(recall, 0, recall[0]), np.insert(precision, 0, 0), color="tab:orange", linewidth=2)
@@ -269,11 +263,9 @@ def plot_precision_recall_curve_zoomin(plFileTest, statsFileTest, model_save_fil
     axins.set_xticks([0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1], ["0.90", "", "", "", "", "0.95", "", "", "", "", "1"])
     axins.set_yticks([0.6, 0.7, 0.8, 0.9, 1], ["0.6", "", "0.8", "", "1"])
     axins.tick_params(axis='both', which='major', labelsize=16)
-    #axins.set_aspect('equal')
     axins.set_axes_locator(InsetPosition(ax1, [0.3, 0.3, 0.4, 0.4]))  # Move the zoomed-in plot, posx, posy, width, height
     mark_inset(ax1, axins, loc1=2, loc2=4, fc="none", ec="gray", linestyle='--') # loc1 and loc2 change the connecting corners of the zoomin
     axins.text(x=0.935, y=0.80 ,s="AP={}".format(round(average_precision_score(y_test, probas_[:, 1]), 2)), ha="center", va="center", fontsize=16)
-    #axins.text(x=0.95, y=0.94 ,s="AP={}".format(round(average_precision_score(y_test, probas_[:, 1]), 2)), ha="center", va="center", fontsize=16)
     plt.draw()
 
     plt.tight_layout()
@@ -285,7 +277,7 @@ def plot_precision_recall_curve_zoomin(plFileTest, statsFileTest, model_save_fil
     plt.savefig(results_folder + '{}.png'.format(results_file))
 
 
-def plot_precision_recall_curve(y_test, probas_, isValidation=False):
+def plot_precision_recall_curve(y_test, probas_, is_validation=False, is_full_pipeline=False):
     fig, ax = plt.subplots(figsize=(5, 4))
     
     precision, recall, thresholds = precision_recall_curve(y_test, probas_[:, 1])
@@ -307,51 +299,26 @@ def plot_precision_recall_curve(y_test, probas_, isValidation=False):
     results_folder = 'results/'
     if not os.path.exists(results_folder):
         os.makedirs(results_folder)
-    if isValidation == False:
-        plt.savefig(results_folder + 'precision_recall_curve_target_separation.pdf')
-        plt.savefig(results_folder + 'precision_recall_curve_target_separation.png')
-    else:
+    if is_full_pipeline == True:
+        plt.savefig(results_folder + 'precision_recall_curve_target_separation_full_pipeline.pdf')
+        plt.savefig(results_folder + 'precision_recall_curve_target_separation_full_pipeline.png')
+    elif is_validation == True:
         plt.savefig(results_folder + 'precision_recall_curve_target_separation_validation.pdf')
         plt.savefig(results_folder + 'precision_recall_curve_target_separation_validation.png')
+    else:
+        plt.savefig(results_folder + 'precision_recall_curve_target_separation.pdf')
+        plt.savefig(results_folder + 'precision_recall_curve_target_separation.png')
 
 
-def gatherDataset(plFile, statsFile):
-    #pl = pd.read_csv(plFile) 
+def gather_dataset(statsFile):
     stats = pd.read_csv(statsFile) 
 
     print("stats before:", stats)
-    #print("pl before:", pl)
-
-    # Remove NaNs that may represent oses
-    #stats = stats.dropna(inplace=True)
-    #pl = pl.dropna(inplace=True)
-
-    #print("stats:", stats)
-    #print("pl:", pl)
-
-    # Transform dtype object columns to numeric
-    #cols = stats[stats.columns[:LABEL_INDEX]].select_dtypes(exclude=['float']).columns
-    #stats[cols] = stats[cols].apply(pd.to_numeric, downcast='float', errors='coerce')
-
-    # Find columns with NaN or Inf values
-    #nan_inf_columns = stats.columns[stats.apply(lambda x: x.isnull().any() or np.isinf(x).any())].tolist()
-    # Print the column names
-    #print("--- 1:", nan_inf_columns)
-
-    # Find columns with NaN or Inf values
-    #nan_inf_columns = pl.columns[pl.apply(lambda x: x.isnull().any() or np.isinf(x).any())].tolist()
-    # Print the column names
-    #print("--- 2:", nan_inf_columns)
 
     # Transform dtype object columns to numeric
     cols = stats[stats.columns[:LABEL_INDEX]].select_dtypes(exclude=['float']).columns
     stats[cols] = stats[cols].apply(pd.to_numeric, downcast='float', errors='coerce')
 
-    # drop class (last column)
-    #pl = pl[pl.columns[:LABEL_INDEX]]
-
-    # Combine both feature sets side by side
-    #train = pd.concat([pl, stats], axis=1)
     train = stats
     train['Class'] = train['Class'].astype(int)
 
@@ -375,12 +342,8 @@ def gatherDataset(plFile, statsFile):
     return x_train, y_train
 
 
-def gatherFullPipelineDataset(cols):
-    # TODO: pass this dinamically on app
-    #clientsFullPipeline = pickle.load(open('../source_separation/full_pipeline_features/client_features_source_separation_thr_0.9_small_OSTest.pickle', 'rb'))
-    #clientsFullPipeline = pickle.load(open('../source_separation/full_pipeline_features/client_features_source_separation_thr_0.002577161882072687_small_OSTest.pickle', 'rb'))
+def gather_full_pipeline_dataset():
     clientsFullPipeline = pickle.load(open('../source_separation/full_pipeline_features/client_features_source_separation_thr_0.0010103702079504728_small_OSTest.pickle', 'rb'))
-    #clientsFullPipeline = pickle.load(open('../source_separation/full_pipeline_features/client_features_source_separation_thr_0.0016687361057847738_small_OSValidate.pickle', 'rb'))
     captures = list(clientsFullPipeline.keys())
 
     x_train = pd.DataFrame(clientsFullPipeline.values())
@@ -401,12 +364,7 @@ def gatherFullPipelineDataset(cols):
     print("\n--- x_train full pipeline", x_train)
     
     y_train = x_train['Class']
-    # TODO: Check if it is correct to remove labels
     x_train = x_train[x_train.columns[:LABEL_INDEX]]
-
-    # Shuffle dataset
-    #x_train = x_train.sample(frac = 1)
-    print("y_train", y_train)
              
     return x_train, y_train, pd.DataFrame(captures, columns =['Capture'])
 
@@ -414,7 +372,7 @@ def gatherFullPipelineDataset(cols):
 def train(plFileTrain, statsFileTrain, model_save_file):
 
     print("\n=== Gathering training dataset ...")
-    X_train , y_train = gatherDataset(plFileTrain, statsFileTrain)
+    X_train , y_train = gather_dataset(statsFileTrain)
 
     print("\n=== Creating model ...")
     model = XGBClassifier()
@@ -428,16 +386,16 @@ def train(plFileTrain, statsFileTrain, model_save_file):
     joblib.dump(model, models_folder+model_save_file)
 
 
-def hyperparameter_tuning(plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, statsFileTest, algorithm='GridSearch'):
+def hyperparameter_tuning(plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, stats_file_test, algorithm='GridSearch'):
     if algorithm == 'GridSearch':
-        hyperparameter_tuning = GridSearch(plFileValidate, statsFileValidate, plFileTest, statsFileTest)
+        hyperparameter_tuning = GridSearch(plFileValidate, statsFileValidate, plFileTest, stats_file_test)
     elif algorithm == 'BayesianOptimization':
-        hyperparameter_tuning = BayesianOptimization(plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, statsFileTest)
+        hyperparameter_tuning = BayesianOptimization(plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, stats_file_test)
 
     hyperparameter_tuning.search_parameters()
 
 
-def test(plFileTest, statsFileTest, model_save_file):
+def test(stats_file_test, model_save_file):
 
     if os.path.isfile(models_folder+model_save_file):
         print("Gathering trained model ...")
@@ -448,7 +406,7 @@ def test(plFileTest, statsFileTest, model_save_file):
         exit()
 
     print("Gathering testing dataset ...")
-    X_test , y_test = gatherDataset(plFileTest, statsFileTest)
+    X_test , y_test = gather_dataset(stats_file_test)
 
     # Predicts the probability of each element to belong to a determined class
     probas_ = model.predict_proba(np.asarray(X_test))
@@ -468,11 +426,11 @@ def test_full_pipeline(dataset_name, model_save_file):
         exit()
 
     print("Gathering full pipeline testing dataset ...")
-    X_test , y_test, test_captures = gatherFullPipelineDataset(model.feature_names)
+    X_test , y_test, test_captures = gather_full_pipeline_dataset()
 
     # Predicts the probability of each element to belong to a determined class
     probas_ = model.predict_proba(np.asarray(X_test))
-    plot_precision_recall_curve(y_test, probas_)
+    plot_precision_recall_curve(y_test, probas_, is_full_pipeline=True)
 
     outputClientFeatures = {}
     predictions_final = get_tpr_fpr_threshold_preds(probas_[:, 1], y_test)

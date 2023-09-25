@@ -279,36 +279,28 @@ def plot_precision_recall_curve_zoomin(plFileTest, statsFileTest, model_save_fil
     
     precision, recall, thresholds = precision_recall_curve(y_test, probas_[:, 1])
 
-    for i, p in enumerate(precision):
-        if round(p, 2) == 0.99:
-            print("Precision: {}; recall: {}".format(p, recall[i]))
+    # for i, p in enumerate(precision):
+    #     if round(p, 2) == 0.99:
+    #         print("Precision: {}; recall: {}".format(p, recall[i]))
 
-    for i, r in enumerate(recall):
-        if round(r, 2) == 0.99:
-            print("xxx Precision: {}; recall: {}".format(precision[i], r))
+    # for i, r in enumerate(recall):
+    #     if round(r, 2) == 0.99:
+    #         print("xxx Precision: {}; recall: {}".format(precision[i], r))
 
     plt.plot(np.insert(recall, 0, recall[0]), np.insert(precision, 0, 0), linewidth=4, color="tab:blue", zorder=0)
     plt.ylabel("Precision")
     plt.xlabel("Recall")
     plt.ylim(0.49, 1.01)
     plt.xlim(0, 1.01)
-    #ax2.set_ylim(0.89, 1.01)
-    #ax2.set_xlim(0.89, 1.01)
     plt.xticks([0, 0.2, 0.4, 0.6, 0.8, 1], ["0", "0.2", "0.4", "0.6", "0.8", "1"])
     plt.yticks([0.5, 0.6, 0.7, 0.8, 0.9, 1], ["0.5", "0.6", "0.7", "0.8", "0.9", "1"])
-    #ax2.set_yticks([0.90, 0.95, 1], [0.90, 0.95, 1])
-    #ax2.set_yticks([0.90, 0.95, 1], [0.90, 0.95, 1])
 
-    #axins = zoomed_inset_axes(ax1, zoom=2, loc="upper right")
-    #axins = inset_axes(ax1, width="10%", height="10%", loc="upper right")
     axins = ax1.inset_axes([0.1, 0.1, 0.80, 0.80])
     axins.spines[['right', 'top']].set_visible(True)
     axins.plot(np.insert(recall, 0, recall[0]), np.insert(precision, 0, 0), linewidth=2)
     axins.set_xlim(0.8, 1)
     axins.set_ylim(0.95, 1)
     axins.set_xticks([0.8, 0.82, 0.84, 0.86, 0.88, 0.9, 0.92, 0.94, 0.96, 0.98, 1], ["0.8", "", "", "", "", "0.9", "", "", "", "",  "1"])
-    #axins.set_yticks([0.9, 0.91, 0.92, 0.93, 0.94, 0.95, 0.96, 0.97, 0.98, 0.99, 1], ["0.90", "", "", "", "", "0.95", "", "", "", "", "1"])
-    #axins.set_xticks([0.95, 0.96, 0.97, 0.98, 0.99, 1], ["0.95", "", "", "", "", "1"])
     axins.set_yticks([0.95, 0.96, 0.97, 0.98, 0.99, 1], ["0.95", "", "", "", "", "1"])
     axins.tick_params(axis='both', which='major', labelsize=16)
     axins.set_axes_locator(InsetPosition(ax1, [0.3, 0.3, 0.4, 0.4]))  # Move the zoomed-in plot, posx, posy, width, height
@@ -398,7 +390,7 @@ def test(plFileTest, statsFileTest, model_save_file):
     return probas_
 
 
-def test_full_pipeline(dataset_name, plFileTest, statsFileTest, model_save_file, optimalThr=True):
+def test_full_pipeline(dataset_name, plFileTest, statsFileTest, model_save_file, optimal_thr=True):
 
     if os.path.isfile(models_folder+model_save_file):
         print("Gathering trained model ...")
@@ -417,7 +409,7 @@ def test_full_pipeline(dataset_name, plFileTest, statsFileTest, model_save_file,
 
     fpr, tpr, thresholds = roc_curve(y_test, probas_[:, 1], pos_label=1)
 
-    if optimalThr == True:
+    if optimal_thr == True:
         decision_threshold = optimal_threshold(tpr, fpr, thresholds)
         print("decision_threshold", decision_threshold)
     else:
