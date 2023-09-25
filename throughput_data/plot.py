@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import genfromtxt
 import matplotlib.pyplot as plt
+import sys
 
 data = []
 avg_pairs = []
@@ -10,10 +11,19 @@ stddev_times = []
 stddev_throughput = []
 sol = ["subsetsum", "subsetsum2d", "deepcorr", "deepcoffea"]
 folder = "A100SXM4"
+nb_samples = "A100SXM4"
+
+if len(sys.argv) > 1:
+    sol = [sys.argv[1]]
+if len(sys.argv) > 2:
+    folder = sys.argv[2]
+if len(sys.argv) > 3:
+    nb_samples = int(sys.argv[3])
+
 for s in range(len(sol)):
     s_str = sol[s]
     data += [[]]
-    for i in range(1,11):
+    for i in range(1,nb_samples+1):
         filename_subsetsum = "{2}/samples_{0}/parsed_sample_{0}_s{1}".format(s_str, i, folder)
         idx   = np.array([])
         pairs = np.array([])

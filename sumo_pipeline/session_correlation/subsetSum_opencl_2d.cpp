@@ -11,12 +11,12 @@
 #include "subsetsum.h"
 
 #define OCL_CHECK(result, fn, ...) \
-    if(((result) = (fn)) != CL_SUCCESS) { std::cerr << "[line " << __LINE__ << "]" << getErrorString(result) << std::endl; __VA_ARGS__ ; }
+    if(((result) = (fn)) != CL_SUCCESS) { /* std::cerr << "[line " << __LINE__ << "]" << getErrorString(result) << std::endl */; __VA_ARGS__ ; }
 
 #define OCL_ERROR(result, fn, ...) \
     try { OCL_CHECK(result, fn); } catch (cl::Error &exception) \
     { \
-        std::cerr << "[line " << __LINE__ << "]" << exception.what() << " | " << getErrorString(exception.err()) << std::endl; \
+        /* std::cerr << "[line " << __LINE__ << "]" << exception.what() << " | " << getErrorString(exception.err()) << std::endl */; \
         __VA_ARGS__; \
     }
 
@@ -275,6 +275,7 @@ int main(int argc, char** argv)
     TIMER_READ(t1);
     wholeLoopSubsetSum(&(*client_num)[0], &(*os_num)[0], &(*buckets)[0], &(*windows)[0], nPairs, delta, buckets_per_window, buckets_overlap, &(*scores)[0], &(*acc_windows)[0]);
     TIMER_READ(t2);
+    printf("Nb pairs: %li\n", nPairs);
     printf("Exec time (s): %f\n", TIMER_DIFF_SECONDS(t1, t2));
 
     delete client_num;
