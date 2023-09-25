@@ -18,5 +18,5 @@ do
 done
 cd ..
 
-python3 plot.py "subsetsum2d" "."
+python3 plot.py "subsetsum2d" "." 10
 

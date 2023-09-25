@@ -27,8 +27,7 @@ The datasets are also available from:
 
 ## Throughput/latency
 
-To collect the latency/throughput metrics of SUMo follow the instructions in (throughput_sumo.sh)[./experiments/throughput_sumo.sh]. It should output a plot with the latency/throughput curve of our solution.
-
+To collect the latency/throughput metrics of SUMo follow the instructions in (throughput_sumo.sh)[./experiments/throughput_sumo.sh]. It should output a plot in `sumo/experiments/plot_subsetsum2d.pdf` with the latency/throughput curve of our solution.
 
 
 ### If you make use of our please cite our NDSS'24 paper:

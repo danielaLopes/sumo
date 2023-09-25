@@ -18,7 +18,7 @@ cat <<EOF > EXP_NB_PAIRS
 99623485
 EOF
 
-for i in $(seq 2)
+for i in $(seq 10)
 do
   j=0
   touch samples_subsetsum2d/sample_subsetsum2d_s$i
