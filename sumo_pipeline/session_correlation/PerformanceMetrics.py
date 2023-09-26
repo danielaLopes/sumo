@@ -86,7 +86,8 @@ class PerformanceMetrics:
         self.__set_f1_score()
 
     def __repr__(self):
-        return f"""Precision: {self.precision};
+        return f"""tp: {self.tp}; fp: {self.fp}; tn: {self.tn}; fn: {self.fn}; 
+                Precision: {self.precision};
                 recall: {self.recall};
                 fpr: {self.fpr}; fnr: {self.fnr};
                 f1-score: {self.f1_score}\n"""

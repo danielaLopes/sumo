@@ -199,8 +199,7 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
     client_file_paths = list(glob.iglob(os.path.join(top_path+'/client', '**/folderDict.pickle'), recursive=True))
 
     results = []
-    count_wrong_clients = 0
-    for test_idx, client_file_path in tqdm(enumerate(client_file_paths), desc="Getting pairs features ..."):
+    for _, client_file_path in tqdm(enumerate(client_file_paths), desc="Getting pairs features ..."):
         client_session_pcap_name = client_file_path.split('/')[-2]
         if client_session_pcap_name not in client_session_ids_full_pipeline:
             if 'alexa' not in client_session_pcap_name:
@@ -222,9 +221,6 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
             client_flows[session_id] = client_dict
         if session_id is not None and onion_dict is not None:
             onion_flows[session_id] = onion_dict
-
-    #print("----> len(client_flows ) BEFORE ", len(client_flows))
-    #print("----> len(onion_flows) BEFORE ", len(onion_flows))
     
     for client_session_id in client_session_ids_full_pipeline:
         if "_client.pcap" in client_session_id:
@@ -233,24 +229,17 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
             session_id = client_session_id.split("_hs.pcap")[0]
 
         if session_id in client_flows:
-        #if client_session_id in client_flows:
             continue
         
-        # Onion-side flow was mistaken as a client side flow in the filtering phase
+        # Onion-side flow was mistaken as a client-side flow in the filtering phase
         if '_hs.pcap' in client_session_id:
             client_session_id_split = client_session_id.split("_")
             client_folder = client_session_id_split[1].split("-ostest-")[0]
             client_extracted_features_folder = get_extracted_features_folder(top_path, "onion", client_folder, client_session_id)
             client_file_path = f"{client_extracted_features_folder}folderDict.pickle"
             client_folder_dict = pickle.load(open(client_file_path, 'rb'))
-            #client_flows[session_id] = flows.ClientFlow(client_folder_dict['hsMetaStats']['initialTimestamp'], client_folder_dict['hsMetaStats']['lastTimestamp'], client_folder_dict['hsFlow']['timesOutAbs'])
             packet_count_in = get_bucketized_packet_count(client_folder_dict['hsFlow']['timesOutAbs'], client_folder_dict['hsMetaStats']['initialTimestamp'], client_folder_dict['hsMetaStats']['lastTimestamp'], time_sampling_interval)
             client_flows[session_id] = flows.ClientFlow(client_folder_dict['hsMetaStats']['initialTimestamp'], client_folder_dict['hsMetaStats']['lastTimestamp'], packet_count_in, client_folder_dict['hsFlow']['timesOutAbs'])
-
-    #actual_os_flows_count = 0
-    #for onion_session_id in onion_session_ids_full_pipeline:
-    #    if "_hs.pcap" in onion_session_id:
-    #        actual_os_flows_count += 1
 
     onion_file_paths = list(glob.iglob(os.path.join(top_path+'/onion', '**/folderDict.pickle'), recursive=True))
     for onion_file_path in onion_file_paths:
@@ -267,12 +256,13 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
     for onion_session_id in onion_session_ids_full_pipeline:
         if "_client.pcap" in onion_session_id:
             session_id = onion_session_id.split("_client.pcap")[0]
-        elif "_hs.pcap" in onion_session_id:
+        else: # "_hs.pcap" in onion_session_id:
             session_id = onion_session_id.split("_hs.pcap")[0]
 
         if session_id in onion_flows:
             continue
         
+        # Client-side flow was mistaken as an onion-side flow in the filtering phase
         if '_client.pcap' in onion_session_id:
             onion_session_id_split = onion_session_id.split("_")
             client_folder = onion_session_id_split[0]
@@ -280,17 +270,6 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
             onion_file_path = f"{onion_extracted_features_folder}folderDict.pickle"
             onion_folder_dict = pickle.load(open(onion_file_path, 'rb'))
             onion_flows[session_id] = flows.OnionFlow(onion_folder_dict['clientMetaStats']['initialTimestamp'], onion_folder_dict['clientMetaStats']['lastTimestamp'], onion_folder_dict['clientFlow']['timesInAbs'])
-
-    #print("----> count_wrong_clients", count_wrong_clients)
-    #print("----> count_wrong_onions", count_wrong_onions)
-
-    #print("----> len(client_flows )AFTER ", len(client_flows))
-    #print("----> len(onion_flows) AFTER ", len(onion_flows))
-
-    #print("\n----> missed_client_flows_per_duration_full_pipeline", missed_client_flows_per_duration_full_pipeline)
-    #print("\n----> missed_os_flows_per_duration_full_pipeline", missed_os_flows_per_duration_full_pipeline)
-
-    #print("=== Finished gathering data on correlated pairs {} : {}".format(len(client_flows), len(onion_flows)))
 
     client_keys = list(client_flows.keys())
     for client_session_id in client_keys:
@@ -302,8 +281,6 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
                                                                        buckets_overlap,
                                                                        epoch_size, 
                                                                        epoch_tolerance))
-
-    #print("=== Finished gathering data on uncorrelated pairs {}".format(len(possible_request_combinations)))
 
     return (
         possible_request_combinations, 

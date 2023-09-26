@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 import logging
 logging.basicConfig(level=logging.INFO)
 
-import feature_collection
+import generate_pairs
 import process_results
 import subsetSumOpenCL2DWrapper as sliding_subset_sum
 import dataset_concurrency_analysis
@@ -186,7 +186,7 @@ class PreProcessedNoFullPipelineState(State):
             self.possible_request_combinations, 
             self.client_flows, 
             self.onion_flows
-        ) = feature_collection.process_features_epochs_sessions(self.sss.dataset_name, 
+        ) = generate_pairs.process_features_epochs_sessions(self.sss.dataset_name, 
                                                                 self.time_sampling_interval,
                                                                 self.buckets_per_window, 
                                                                 self.buckets_overlap,
@@ -271,19 +271,23 @@ class PreProcessedFullPipelineState(State):
             self.missed_os_flows,
             self.missed_client_flows_per_duration,
             self.missed_os_flows_per_duration
-        ) = feature_collection.process_features_epochs_sessions_full_pipeline(self.sss.dataset_name, 
+        ) = generate_pairs.process_features_epochs_sessions_full_pipeline(self.sss.dataset_name, 
                                                                               self.time_sampling_interval,
                                                                               self.buckets_per_window, 
                                                                               self.buckets_overlap, 
                                                                               self.epoch_size, 
                                                                               self.epoch_tolerance, 
                                                                               self.sss.min_session_durations)
+        pickle.dump(list(self.possible_request_combinations.keys()), open("pairs_sumo.pickle", "wb"))
 
     def __repr__(self) -> str:
         return "PreProcessedFullPipelineState"
     
     def plot(self) -> None:
         super().plot()
+        print("self.results_by_min_duration 0: ", self.results_by_min_duration[self.sss.thresholds[0]][480])
+        print("self.results_by_min_duration 1: ", self.results_by_min_duration[self.sss.thresholds[-1]][480])
+        print("self.results_by_min_duration 100: ", self.results_by_min_duration[self.sss.thresholds[100]][480])
         results_plot_maker.precision_recall_curve_with_threshold_multiple_session_durations(FIGURES_FULL_PIPELINE_RESULTS_FOLDER, self.results_by_min_duration, self.flow_count_by_duration_correlated, self.sss.dataset_name)
     
 class PreProcessedPartialCoveragePercentageState(State):
@@ -307,9 +311,8 @@ class PreProcessedPartialCoveragePercentageState(State):
                          overlap, 
                          delta)
         self.coverage = coverage
+        self.results_by_eu_country = {}
 
-    #def toggle_state(self, coverage) -> None:
-        #self.sss.state = self.sss.pre_processed_partial_coverage_percentage_states_by_coverage[coverage]
     def toggle_state(self) -> None:
         self.sss.state = self
 
@@ -318,7 +321,7 @@ class PreProcessedPartialCoveragePercentageState(State):
             self.possible_request_combinations, 
             self.client_flows, 
             self.onion_flows
-        ) = feature_collection.process_features_epochs_sessions_by_eu_country(self.sss.dataset_name, 
+        ) = generate_pairs.process_features_epochs_sessions_by_eu_country(self.sss.dataset_name, 
                                                                                   self.coverage, 
                                                                                   self.time_sampling_interval, 
                                                                                   self.buckets_per_window, 
@@ -327,7 +330,7 @@ class PreProcessedPartialCoveragePercentageState(State):
                                                                                   self.epoch_tolerance)
 
     def __repr__(self) -> str:
-        return "PreProcessedPartialCoveragePercentageState"
+        return f"PreProcessedPartialCoveragePercentageState ({self.coverage})"
     
     #def plot(self, captures_folder_test: str, dataset_name: str, threshold: float) -> None:
     #    pass
@@ -353,9 +356,8 @@ class PreProcessedPartialCoverageStateByContinent(State):
                          overlap, 
                          delta)
         self.zone = zone
+        self.results_by_continent = {}
 
-    #def toggle_state(self, coverage) -> None:
-        #self.sss.state = self.sss.pre_processed_partial_coverage_percentage_states_by_coverage[coverage]
     def toggle_state(self) -> None:
         self.sss.state = self
 
@@ -364,7 +366,7 @@ class PreProcessedPartialCoverageStateByContinent(State):
             self.possible_request_combinations, 
             self.client_flows, 
             self.onion_flows
-        ) = feature_collection.process_features_epochs_sessions(self.sss.dataset_name, 
+        ) = generate_pairs.process_features_epochs_sessions(self.sss.dataset_name, 
                                                                 self.time_sampling_interval,
                                                                 self.buckets_per_window, 
                                                                 self.buckets_overlap,
@@ -372,21 +374,20 @@ class PreProcessedPartialCoverageStateByContinent(State):
                                                                 self.epoch_tolerance)
 
     def __repr__(self) -> str:
-        return "PreProcessedPartialCoverageStateByContinent"
+        return f"PreProcessedPartialCoverageStateByContinent ({self.zone})"
     
     #def plot(self, captures_folder_test: str, dataset_name: str, threshold: float) -> None:
     #    pass
 
     def filter_by_zone(self, baseline_possible_request_combinations):
-        for start, (client_session_id, onion_session_id) in enumerate(self.baseline_possible_request_combinations.keys()):
-            splitclient_session_id = client_session_id.split('_')
-            splitonion_session_id = onion_session_id.split('_')
-            client_name1 = splitclient_session_id[0].split('-client')[0]
-            os_name1 = 'os-' + splitclient_session_id[1].split('-os-')[1]
-            client_name2 = splitonion_session_id[0].split('-client')[0]
-            os_name2 = 'os-' + splitonion_session_id[1].split('-os-')[1]
+        print("self.possible_request_combinations", self.possible_request_combinations)
+        for _, (client_session_id, onion_session_id) in enumerate(baseline_possible_request_combinations.keys()):
+            split_client_session_id = client_session_id.split('_')
+            split_onion_session_id = onion_session_id.split('_')
+            client_name1 = split_client_session_id[0].split('-client')[0]
+            os_name2 = 'os-' + split_onion_session_id[1].split('-os-')[1]
     
-            if not (self.zone == self.sss.client_zones[client_name1] or self.zone == self.os_zones[os_name2]):
+            if not (self.zone == self.sss.client_zones[client_name1] or self.zone == self.sss.os_zones[os_name2]):
                 self.possible_request_combinations[(client_session_id, onion_session_id)] = baseline_possible_request_combinations[(client_session_id, onion_session_id)]
 
 def get_cache_filename(dataset_name):
@@ -403,7 +404,7 @@ def dump_instance_decorator(arg_index):
             result = func(*args, **kwargs)
             
             # Pickle dump the instance
-            instance = args[0]  # Assuming the instance is the first argument
+            instance = args[0]  # Always needs to be used with and instance of SlidingSubsetSum
             dataset_name = args[arg_index]
             cached_filename = get_cache_filename(dataset_name)
             logging.info(f"Storing file named \"{cached_filename}\"")
@@ -510,7 +511,7 @@ class SlidingSubsetSum:
         self.state = self.pre_processed_no_full_pipeline_state
 
     @cached_property
-    def get_zones_without_baseline(self):
+    def zones_without_baseline(self):
         return self.zones[1 : ]
 
     @cached_property
@@ -743,8 +744,8 @@ class SlidingSubsetSum:
                         self.state.results_by_min_duration[threshold][min_session_duration] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
                         self.state.results_by_min_duration_metrics_map[threshold][min_session_duration] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
                     else:
-                        self.state.results_by_min_duration[threshold][min_session_duration] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
-                        self.state.results_by_min_duration_metrics_map[threshold][min_session_duration] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
+                        self.state.results_by_min_duration[threshold][min_session_duration] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows_per_duration[min_session_duration], self.state.missed_os_flows_per_duration[min_session_duration])
+                        self.state.results_by_min_duration_metrics_map[threshold][min_session_duration] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows_per_duration[min_session_duration], self.state.missed_os_flows_per_duration[min_session_duration])
                     for client_session_id, onion_session_id in self.state.possible_request_combinations.keys():
                         duration = self.state.client_flows[client_session_id].get_duration()
 
@@ -781,7 +782,6 @@ class SlidingSubsetSum:
             for threshold in self.thresholds:
                 for min_session_duration in self.min_session_durations:
                     self.state.results_by_min_duration[threshold][min_session_duration].calculate_performance_scores()
-
                     self.state.results_by_min_duration_metrics_map[threshold][min_session_duration].calculate_performance_scores()
         else:
             logging.info("Already had data on evaluate_by_duration()")
@@ -882,17 +882,21 @@ class SlidingSubsetSum:
         self.state.plot()
 
     @dump_instance_decorator(arg_index=1)
+    def __pre_process_state(self, dataset_name: str) -> None:
+        self.state.pre_process()
+
+    @dump_instance_decorator(arg_index=1)
     def evaluate_coverage_by_eu_country(self, dataset_name: str):
         for zone, percentage in self.coverage_percentages.items():
-            #self.pre_processed_partial_coverage_percentage_states_by_coverage[coverage].toggle_state(coverage)
             self.pre_processed_partial_coverage_percentage_states_by_coverage[percentage].toggle_state()
             if len(self.state.possible_request_combinations) == 0:
-                self.state.pre_process()
+                #self.state.pre_process()
+                self.__pre_process_state(dataset_name)
             if len(self.state.results_by_eu_country) == 0:
                 #for zone, percentage in self.coverage_percentage.items():
-                logging.info(f"\n====== ANALYZING ZONE: {zone}")
+                logging.info(f"Analyzing zone: {zone}")
                 self.__predict(dataset_name)
-                self.__evaluate_confusion_matrix(self, dataset_name)
+                self.__evaluate_confusion_matrix(dataset_name)
 
                 for threshold in self.state.results_by_zone[percentage].keys():
                     self.state.results_by_zone[percentage][threshold].calculate_performance_scores()
@@ -905,18 +909,27 @@ class SlidingSubsetSum:
         results_plot_maker_partial_coverage.precision_recall_curve_with_threshold_by_eu_country(self.results_by_eu_country, self.coverage_percentage.values(), dataset_name)
 
     @dump_instance_decorator(arg_index=1)
+    def __filter_by_zone_state(self, 
+                               dataset_name: str) -> None:
+        self.state.filter_by_zone(self.pre_processed_partial_coverage_states_by_continent['baseline'].possible_request_combinations)
+
+    @dump_instance_decorator(arg_index=1)
     def evaluate_coverage_by_continent(self, dataset_name: str):
         self.pre_processed_partial_coverage_states_by_continent['baseline'].toggle_state()
         if len(self.state.possible_request_combinations) == 0:
-            self.state.pre_process()
-        for zone in self.get_zones_without_baseline():
+            #self.state.pre_process()
+            self.__pre_process_state(dataset_name)
+        for zone in self.zones_without_baseline:
             self.pre_processed_partial_coverage_states_by_continent[zone].toggle_state()
-            self.state.possible_request_combinations = self.state.filter_by_zone(self.pre_processed_partial_coverage_states_by_continent['baseline'].possible_request_combinations)
+            print(f"self.state: {self.state}")
+            print(f"baseline requests: {len(self.pre_processed_partial_coverage_states_by_continent['baseline'].possible_request_combinations)}")
+            self.__filter_by_zone_state(dataset_name)
         for zone in self.zones:
+            self.pre_processed_partial_coverage_states_by_continent[zone].toggle_state()
             if len(self.state.results_by_continent) == 0:
-                logging.info(f"\n====== ANALYZING ZONE: {zone}")
+                logging.info(f"\n====== Analyzing continents: {zone}")
                 self.__predict(dataset_name)
-                self.__evaluate_confusion_matrix(self, dataset_name)
+                self.__evaluate_confusion_matrix(dataset_name)
 
                 for threshold in self.state.results_by_continent.keys():
                     self.state.results_by_continent[threshold].calculate_performance_scores()
@@ -924,6 +937,7 @@ class SlidingSubsetSum:
         # Group results from all states
         results_by_continent = {}
         for zone in self.zones:
+            self.pre_processed_partial_coverage_states_by_continent[zone].toggle_state()
             results_by_continent[zone] = self.state.results_by_continent
         self.pre_processed_partial_coverage_states_by_continent['baseline'].plot()
         results_plot_maker_partial_coverage.precision_recall_curve_with_threshold_excluding_zones(results_by_continent, dataset_name)
