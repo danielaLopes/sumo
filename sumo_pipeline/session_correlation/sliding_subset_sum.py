@@ -158,6 +158,8 @@ class State(ABC):
             os.mkdir(FIGURES_RESULTS_FOLDER)
         if not os.path.isdir(FIGURES_PAPER_RESULTS_FOLDER):
             os.mkdir(FIGURES_PAPER_RESULTS_FOLDER)
+        if not os.path.isdir(FIGURES_FULL_PIPELINE_RESULTS_FOLDER):
+            os.mkdir(FIGURES_FULL_PIPELINE_RESULTS_FOLDER)
 
 class PreProcessedNoFullPipelineState(State):
     def __init__(self, 
@@ -875,10 +877,9 @@ class SlidingSubsetSum:
         self.pre_processed_no_full_pipeline_state.toggle_state()
         self.state.plot(captures_folder_test, dataset_name, self.thresholds[chosen_threshold])
 
-    def plot_full_pipeline(self, captures_folder_test: str, dataset_name: str) -> None:
-        chosen_threshold = 0
+    def plot_full_pipeline(self) -> None:
         self.pre_processed_full_pipeline_state.toggle_state()
-        self.state.plot(captures_folder_test, dataset_name, self.thresholds[chosen_threshold])
+        self.state.plot()
 
     @dump_instance_decorator(arg_index=1)
     def evaluate_coverage_by_eu_country(self, dataset_name: str):

@@ -12,7 +12,7 @@ from xgboost import XGBClassifier
 #Eval Metrics
 from sklearn.metrics import roc_curve, precision_recall_curve, average_precision_score, precision_recall_fscore_support
 import pandas as pd
-from sklearn.model_selection import GridSearchCV, StratifiedKFold, cross_val_score
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 from hyperopt import hp, fmin, tpe, STATUS_OK, Trials, space_eval
 import time
 
@@ -56,12 +56,12 @@ class HyperparameterTuning:
 
     def __init__(self, plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, statsFileTest):
         print("\n=== Gathering training dataset ...")
-        self.X_train, self.y_train, _ = gatherDataset(plFileTrain, statsFileTrain)
+        self.X_train, self.y_train, _ = gather_dataset(plFileTrain, statsFileTrain)
         print("self.X_train", self.X_train)
         print("\n=== Gathering validation dataset ...")
-        self.X_validate, self.y_validate, _ = gatherDataset(plFileValidate, statsFileValidate)
+        self.X_validate, self.y_validate, _ = gather_dataset(plFileValidate, statsFileValidate)
         print("\n=== Gathering testing dataset ...")
-        self.X_test, self.y_test, _ = gatherDataset(plFileTest, statsFileTest)
+        self.X_test, self.y_test, _ = gather_dataset(plFileTest, statsFileTest)
 
     def search_method(self):
         pass
@@ -189,45 +189,11 @@ class BayesianOptimization(HyperparameterTuning):
 
         return save_file
 
-"""
-class GridSearch(HyperparameterTuning):
-
-    def search_method(self, model):
-        print("\n=== Parameter search with GridSearch  ...")
-
-        grid_search = {
-            'criterion': [model.best_params_['criterion']],
-            'max_depth': [model.best_params_['max_depth']],
-            'max_features': [model.best_params_['max_features']],
-            'min_samples_leaf': [model.best_params_['min_samples_leaf'] - 2, 
-                                model.best_params_['min_samples_leaf'], 
-                                model.best_params_['min_samples_leaf'] + 2],
-            'min_samples_split': [model.best_params_['min_samples_split'] - 3, 
-                                model.best_params_['min_samples_split'], 
-                                model.best_params_['min_samples_split'] + 3],
-            'n_estimators': [model.best_params_['n_estimators'] - 150, 
-                            model.best_params_['n_estimators'] - 100, 
-                            model.best_params_['n_estimators'], 
-                            model.best_params_['n_estimators'] + 100, 
-                            model.best_params_['n_estimators'] + 150]
-        }
-
-        print("\n=== Grid search...")
-        opt_model = GridSearchCV(estimator = model, param_grid = grid_search, 
-                                cv = 4, verbose= 5, n_jobs = -1)
-
-
-    def store_model(self, opt_model):
-        store_model(opt_model, self.X_train, 'source_separation_model_grid_search.joblib')
-"""
-
-
 def optimal_threshold(tpr, fpr, thresholds):
     optimal_idx = np.argmax(tpr - fpr)
     optimal_threshold = thresholds[optimal_idx]
     
     return optimal_threshold
-
 
 def plot_precision_recall_curve(y_test, probas_, isValidation=False):
     fig, ax = plt.subplots(figsize=(5, 4))
@@ -259,7 +225,7 @@ def plot_precision_recall_curve(y_test, probas_, isValidation=False):
         plt.savefig(results_folder + 'precision_recall_curve_source_separation_validation.png')
 
 
-def plot_precision_recall_curve_zoomin(plFileTest, statsFileTest, model_save_file, results_file):
+def plot_precision_recall_curve_zoomin(statsFileTest, model_save_file, results_file):
     
     if os.path.isfile(models_folder+model_save_file):
         print("Gathering trained model ...")
@@ -270,7 +236,7 @@ def plot_precision_recall_curve_zoomin(plFileTest, statsFileTest, model_save_fil
         exit()
 
     print("Gathering testing dataset ...")
-    X_test , y_test, test_captures = gatherDataset(plFileTest, statsFileTest)
+    X_test , y_test, test_captures = gather_dataset(statsFileTest)
 
     # Predicts the probability of each element to belong to a determined class
     probas_ = model.predict_proba(X_test)
@@ -307,7 +273,6 @@ def plot_precision_recall_curve_zoomin(plFileTest, statsFileTest, model_save_fil
     mark_inset(ax1, axins, loc1=2, loc2=4, fc="none", ec="gray", linestyle='--') # loc1 and loc2 change the connecting corners of the zoomin
     axins.text(x=0.87, y=0.985 ,s="AP={}".format(round(average_precision_score(y_test, probas_[:, 1]), 2)), ha="center", va="center", fontsize=16)
     plt.draw()
-
     plt.tight_layout()
 
     results_folder = 'results/'
@@ -316,9 +281,7 @@ def plot_precision_recall_curve_zoomin(plFileTest, statsFileTest, model_save_fil
     plt.savefig(results_folder + '{}.pdf'.format(results_file))
     plt.savefig(results_folder + '{}.png'.format(results_file))
 
-
-def gatherDataset(plFile, statsFile):
-    #pl = pd.read_csv(plFile) 
+def gather_dataset(statsFile):
     stats = pd.read_csv(statsFile) 
 
     print("stats:", stats)
@@ -326,12 +289,7 @@ def gatherDataset(plFile, statsFile):
     cols = stats[stats.columns[:LABEL_INDEX]].select_dtypes(exclude=['float']).columns
     stats[cols] = stats[cols].apply(pd.to_numeric, downcast='float', errors='coerce')
 
-    # drop captures (last column)
-    #pl = pl[pl.columns[:LABEL_INDEX]]
-
-    # Combine both feature sets side by side
     train = stats
-    #train = pd.concat([pl, stats], axis=1)
     train['Class'] = train['Class'].astype(int)
 
     # Remove columns that only have zeros
@@ -348,10 +306,9 @@ def gatherDataset(plFile, statsFile):
     return x_train, y_train, captures
 
 
-def train(plFileTrain, statsFileTrain, model_save_file):
-
+def train(statsFileTrain, model_save_file):
     print("\n=== Gathering training dataset ...")
-    X_train , y_train, _ = gatherDataset(plFileTrain, statsFileTrain)
+    X_train , y_train, _ = gather_dataset(statsFileTrain)
 
     print("\n=== Creating model ...")
     model = XGBClassifier(seed=0) # Seed is 0 to get reproducible results
@@ -360,18 +317,12 @@ def train(plFileTrain, statsFileTrain, model_save_file):
 
     store_model(model, X_train, model_save_file)
 
-
-def hyperparameter_tuning(plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, statsFileTest, algorithm='GridSearch'):
-    if algorithm == 'GridSearch':
-        hyperparameter_tuning = GridSearch(plFileValidate, statsFileValidate, plFileTest, statsFileTest)
-    elif algorithm == 'BayesianOptimization':
-        hyperparameter_tuning = BayesianOptimization(plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, statsFileTest)
-
+def hyperparameter_tuning(statsFileTrain, statsFileValidate, statsFileTest, algorithm='BayesianOptimization'):
+    if algorithm == 'BayesianOptimization':
+        hyperparameter_tuning = BayesianOptimization(statsFileTrain, statsFileValidate, statsFileTest)
     hyperparameter_tuning.search_parameters()
 
-
-def test(plFileTest, statsFileTest, model_save_file):
-
+def test(statsFileTest, model_save_file):
     if os.path.isfile(models_folder+model_save_file):
         print("Gathering trained model ...")
         model = joblib.load(models_folder+model_save_file)
@@ -381,7 +332,7 @@ def test(plFileTest, statsFileTest, model_save_file):
         exit()
 
     print("Gathering testing dataset ...")
-    X_test , y_test, test_captures = gatherDataset(plFileTest, statsFileTest)
+    X_test , y_test, test_captures = gather_dataset(statsFileTest)
 
     # Predicts the probability of each element to belong to a determined class
     probas_ = model.predict_proba(X_test)
@@ -389,8 +340,7 @@ def test(plFileTest, statsFileTest, model_save_file):
     
     return probas_
 
-
-def test_full_pipeline(dataset_name, plFileTest, statsFileTest, model_save_file, optimal_thr=True):
+def test_full_pipeline(dataset_name, statsFileTest, model_save_file, optimal_thr=True):
 
     if os.path.isfile(models_folder+model_save_file):
         print("Gathering trained model ...")
@@ -401,7 +351,7 @@ def test_full_pipeline(dataset_name, plFileTest, statsFileTest, model_save_file,
         exit()
 
     print("Gathering testing dataset ...")
-    X_test , y_test, test_captures = gatherDataset(plFileTest, statsFileTest)
+    X_test , y_test, test_captures = gather_dataset(statsFileTest)
 
     # Predicts the probability of each element to belong to a determined class
     probas_ = model.predict_proba(X_test)
@@ -415,12 +365,11 @@ def test_full_pipeline(dataset_name, plFileTest, statsFileTest, model_save_file,
     else:
         decision_threshold = DECISION_THRESHOLD
 
-    dumpPipelineFeatures(dataset_name, X_test, probas_[:, 1], test_captures, decision_threshold)
+    dump_pipeline_features(dataset_name, X_test, probas_[:, 1], test_captures, decision_threshold)
     
     return probas_
 
-
-def dumpPipelineFeatures(dataset_name, features, predictions, captures, decision_threshold):
+def dump_pipeline_features(dataset_name, features, predictions, captures, decision_threshold):
     print("Dumping features for next stage of the pipeline ...")
     
     outputClientFeatures = {}
