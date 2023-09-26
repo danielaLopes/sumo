@@ -1,5 +1,4 @@
 import ctypes
-from ctypes import alignment, cdll
 
 
 lib = ctypes.CDLL('./subsetsumopencl2d.so')
@@ -11,8 +10,6 @@ lib.wholeLoopSubsetSum.restype = None
 def whole_loop_subset_sum(packetListClient, packetListOS, nPairs, nBuckets, delta, buckets_per_window, buckets_overlap, nWindows, acc_windows):
     count_buckets = sum(nBuckets)
     count_windows = sum(nWindows)
-    #print("nPairs", nPairs)
-    #print("acc_windows", acc_windows)
     client_nums_array = (ctypes.c_int * count_buckets)(*packetListClient)
     os_nums_array = (ctypes.c_int * count_buckets)(*packetListOS)
     n_buckets_array = (ctypes.c_int * nPairs)(*nBuckets)

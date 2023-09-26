@@ -401,7 +401,6 @@ def precision_recall_curve_with_threshold_multiple_session_durations(figures_res
     plt.savefig('{}precision_recall_curve_with_threshold_multiple_session_durations_metricsMap_{}.png'.format(figures_results_folder, dataset_name), bbox_inches='tight')
     plt.savefig('{}precision_recall_curve_with_threshold_multiple_session_durations_metricsMap_{}.pdf'.format(figures_results_folder, dataset_name), bbox_inches='tight')
 
-
     plt.clf()
 
 

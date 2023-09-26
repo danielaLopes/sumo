@@ -87,6 +87,7 @@ def correlate_sessions(dataset_name: str):
     instance = __get_instance(dataset_name)
     instance.correlate_sessions(dataset_name, is_full_pipeline=False)
 
+# TODO: there's a bug, giving better results than the ones in the paper, missing fps
 @app.command()
 def correlate_sessions_full_pipeline(dataset_name: str):
     """
