@@ -3,6 +3,7 @@
 *.pickle
 *.backup
 *.o
+*.so
 *.tfstate
 *.pcap
 *.dat
