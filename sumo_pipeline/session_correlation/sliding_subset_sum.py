@@ -1,5 +1,5 @@
 import numpy as np
-import pickle
+import joblib
 from typing import List, Dict, Tuple, Literal
 import sys
 import os
@@ -199,7 +199,7 @@ class PreProcessedNoFullPipelineState(State):
     def get_concurrency_at_onion(self, dataset_name: str):
         concurrency_file = get_session_concurrency_at_onion_file_name(dataset_name)
         if os.path.isfile(concurrency_file):
-            concurrent_requests = pickle.load(open(concurrency_file, 'rb'))
+            concurrent_requests = joblib.load(concurrency_file)
         else:
             concurrent_requests = dataset_concurrency_analysis.get_session_concurrency_at_onions_from_features(dataset_name)
         return concurrent_requests
@@ -278,7 +278,6 @@ class PreProcessedFullPipelineState(State):
                                                                               self.epoch_size, 
                                                                               self.epoch_tolerance, 
                                                                               self.sss.min_session_durations)
-        pickle.dump(list(self.possible_request_combinations.keys()), open("pairs_sumo.pickle", "wb"))
 
     def __repr__(self) -> str:
         return "PreProcessedFullPipelineState"
@@ -292,7 +291,6 @@ class PreProcessedFullPipelineState(State):
     
 class PreProcessedPartialCoveragePercentageState(State):
     coverage: float
-    results_by_eu_country: Dict[float, PerformanceMetrics.PerformanceMetrics] # {coverage_percentage: PerformanceMetrics, ...}
 
     def __init__(self, 
                  sss: SlidingSubsetSum, 
@@ -311,7 +309,6 @@ class PreProcessedPartialCoveragePercentageState(State):
                          overlap, 
                          delta)
         self.coverage = coverage
-        self.results_by_eu_country = {}
 
     def toggle_state(self) -> None:
         self.sss.state = self
@@ -331,13 +328,9 @@ class PreProcessedPartialCoveragePercentageState(State):
 
     def __repr__(self) -> str:
         return f"PreProcessedPartialCoveragePercentageState ({self.coverage})"
-    
-    #def plot(self, captures_folder_test: str, dataset_name: str, threshold: float) -> None:
-    #    pass
 
 class PreProcessedPartialCoverageStateByContinent(State):
     zone: str
-    results_by_continent: Dict[str, PerformanceMetrics.PerformanceMetrics] # {zone: PerformanceMetrics, ...}
 
     def __init__(self, 
                  sss: SlidingSubsetSum, 
@@ -356,7 +349,6 @@ class PreProcessedPartialCoverageStateByContinent(State):
                          overlap, 
                          delta)
         self.zone = zone
-        self.results_by_continent = {}
 
     def toggle_state(self) -> None:
         self.sss.state = self
@@ -375,12 +367,8 @@ class PreProcessedPartialCoverageStateByContinent(State):
 
     def __repr__(self) -> str:
         return f"PreProcessedPartialCoverageStateByContinent ({self.zone})"
-    
-    #def plot(self, captures_folder_test: str, dataset_name: str, threshold: float) -> None:
-    #    pass
 
     def filter_by_zone(self, baseline_possible_request_combinations):
-        print("self.possible_request_combinations", self.possible_request_combinations)
         for _, (client_session_id, onion_session_id) in enumerate(baseline_possible_request_combinations.keys()):
             split_client_session_id = client_session_id.split('_')
             split_onion_session_id = onion_session_id.split('_')
@@ -403,13 +391,12 @@ def dump_instance_decorator(arg_index):
         def wrapper(*args, **kwargs):
             result = func(*args, **kwargs)
             
-            # Pickle dump the instance
+            # Dump the instance
             instance = args[0]  # Always needs to be used with and instance of SlidingSubsetSum
             dataset_name = args[arg_index]
             cached_filename = get_cache_filename(dataset_name)
             logging.info(f"Storing file named \"{cached_filename}\"")
-            with open(cached_filename, "wb") as file:
-                pickle.dump(instance, file)
+            joblib.dump(instance, cached_filename)
 
             return result
         return wrapper
@@ -536,9 +523,8 @@ class SlidingSubsetSum:
         cached_filename = get_cache_filename(dataset_name)
         try:
             # Try to load the cached instance
-            with open(cached_filename, 'rb') as cache_file:
-                instance = pickle.load(cache_file)
-                logging.info(f"Loaded existing instance named \"{cached_filename}\"")
+            instance = joblib.load(cached_filename)
+            logging.info(f"Loaded existing instance named \"{cached_filename}\"")
         except FileNotFoundError:
             logging.info(f"Creating new instance named \"{cached_filename}\"")
             instance = cls(dataset_name,
@@ -694,14 +680,12 @@ class SlidingSubsetSum:
                         if client_session_id == onion_session_id:
                             self.state.metrics_map[threshold].tp += 1
                         else:
-                            self.state.metrics_map[threshold].fp += 1
-                            
+                            self.state.metrics_map[threshold].fp += 1     
                     else:
                         if client_session_id == onion_session_id:
                             self.state.metrics_map[threshold].fn += 1
                         else:
                             self.state.metrics_map[threshold].tn += 1
-
                 self.state.metrics_map[threshold].calculate_performance_scores()
 
                 client_sessions_with_highest_scores = process_results.count_client_correlated_sessions_highest_score(self.state.scores_per_session_per_client, threshold)
@@ -852,20 +836,12 @@ class SlidingSubsetSum:
             os.mkdir(RESULTS_FOLDER)
         if not os.path.isdir(DATA_RESULTS_FOLDER):
             os.mkdir(DATA_RESULTS_FOLDER)
-
         self.__pre_process(dataset_name, is_full_pipeline)
-        logging.info("\n--- After pre_process")
         self.__predict(dataset_name)
-        logging.info("\n--- After predict")
-        
         self.__evaluate_confusion_matrix(dataset_name)
-        logging.info("\n--- After evaluate_confusion_matrix")
         self.__evaluate_by_duration(dataset_name, is_full_pipeline=is_full_pipeline)
-        logging.info("\n--- After evaluate_by_duration")
         self.__evaluate_by_client(dataset_name)
-        logging.info("\n--- After evaluate_by_client")
         self.__evaluate_by_os(dataset_name)
-        logging.info("\n--- After evaluate_by_os")
 
     def plot_paper_results(self, captures_folder_test: str, dataset_name: str) -> None:
         chosen_threshold = 0
@@ -890,54 +866,48 @@ class SlidingSubsetSum:
         for zone, percentage in self.coverage_percentages.items():
             self.pre_processed_partial_coverage_percentage_states_by_coverage[percentage].toggle_state()
             if len(self.state.possible_request_combinations) == 0:
-                #self.state.pre_process()
                 self.__pre_process_state(dataset_name)
-            if len(self.state.results_by_eu_country) == 0:
-                #for zone, percentage in self.coverage_percentage.items():
+            if len(self.state.metrics_map_final_scores) == 0:
                 logging.info(f"Analyzing zone: {zone}")
                 self.__predict(dataset_name)
                 self.__evaluate_confusion_matrix(dataset_name)
-
-                for threshold in self.state.results_by_zone[percentage].keys():
-                    self.state.results_by_zone[percentage][threshold].calculate_performance_scores()
 
         # Group results from all states
         results_by_eu_country = {}
         for zone, percentage in self.coverage_percentages.items():
             results_by_eu_country[percentage] = self.state.results_by_zone
         self.pre_processed_partial_coverage_percentage_states_by_coverage[1].plot()
-        results_plot_maker_partial_coverage.precision_recall_curve_with_threshold_by_eu_country(self.results_by_eu_country, self.coverage_percentage.values(), dataset_name)
+        results_plot_maker_partial_coverage.precision_recall_curve_with_threshold_by_eu_country(self.metrics_map_final_scores, self.coverage_percentage.values(), dataset_name)
 
     @dump_instance_decorator(arg_index=1)
-    def __filter_by_zone_state(self, 
-                               dataset_name: str) -> None:
+    def __filter_by_zone_state(self, dataset_name: str) -> None:
         self.state.filter_by_zone(self.pre_processed_partial_coverage_states_by_continent['baseline'].possible_request_combinations)
 
     @dump_instance_decorator(arg_index=1)
     def evaluate_coverage_by_continent(self, dataset_name: str):
         self.pre_processed_partial_coverage_states_by_continent['baseline'].toggle_state()
         if len(self.state.possible_request_combinations) == 0:
-            #self.state.pre_process()
             self.__pre_process_state(dataset_name)
+        else:
+            logging.info(f"Loaded existing baseline pairs")
         for zone in self.zones_without_baseline:
             self.pre_processed_partial_coverage_states_by_continent[zone].toggle_state()
-            print(f"self.state: {self.state}")
-            print(f"baseline requests: {len(self.pre_processed_partial_coverage_states_by_continent['baseline'].possible_request_combinations)}")
-            self.__filter_by_zone_state(dataset_name)
+            if len(self.state.possible_request_combinations) == 0:
+                self.__filter_by_zone_state(dataset_name)
+            else:
+                logging.info(f"Loaded existing pairs for excluding {zone}")
         for zone in self.zones:
             self.pre_processed_partial_coverage_states_by_continent[zone].toggle_state()
-            if len(self.state.results_by_continent) == 0:
-                logging.info(f"\n====== Analyzing continents: {zone}")
+            if len(self.state.metrics_map_final_scores) == 0:
+                logging.info(f"Analyzing continents: {zone}")
                 self.__predict(dataset_name)
                 self.__evaluate_confusion_matrix(dataset_name)
-
-                for threshold in self.state.results_by_continent.keys():
-                    self.state.results_by_continent[threshold].calculate_performance_scores()
-
+            else:
+                logging.info(f"Loaded existing results for excluding {zone}")
         # Group results from all states
         results_by_continent = {}
         for zone in self.zones:
             self.pre_processed_partial_coverage_states_by_continent[zone].toggle_state()
-            results_by_continent[zone] = self.state.results_by_continent
+            results_by_continent[zone] = self.state.metrics_map_final_scores
         self.pre_processed_partial_coverage_states_by_continent['baseline'].plot()
         results_plot_maker_partial_coverage.precision_recall_curve_with_threshold_excluding_zones(results_by_continent, dataset_name)

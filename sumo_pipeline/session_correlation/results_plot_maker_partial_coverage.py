@@ -7,13 +7,11 @@ from mycolorpy import colorlist as mcp
 import pickle
 import sys
 
+from constants import *
+
 
 np.set_printoptions(threshold=sys.maxsize)
 np.set_printoptions(suppress=True)
-
-
-
-BASE_DIR = 'results/figures/'
 
 
 #plt.rc('font', size=28)          # controls default text sizes
@@ -49,7 +47,6 @@ def precision_recall_curve_with_threshold_excluding_zones(results_by_zone, datas
             x_axis_recall.append(results_by_zone[zone][threshold].recall)
             y_axis_precision.append(results_by_zone[zone][threshold].precision)
 
-        #total_flows = results_by_zone[zone][thresholds[0]].tp + results_by_zone[zone][thresholds[0]].fp + results_by_zone[zone][thresholds[0]].tn + results_by_zone[zone][thresholds[0]].fn
         total_flows = results_by_zone[zone][thresholds[0]].tp + results_by_zone[zone][thresholds[0]].fn
 
         if i == 0:
@@ -80,8 +77,8 @@ def precision_recall_curve_with_threshold_excluding_zones(results_by_zone, datas
     #fig.tight_layout()
 
 
-    plt.savefig('{}precision_recall_curve_with_threshold_excluding_zones_{}.png'.format(BASE_DIR, dataset_name), bbox_inches='tight')
-    plt.savefig('{}precision_recall_curve_with_threshold_excluding_zones_{}.pdf'.format(BASE_DIR, dataset_name), bbox_inches='tight')
+    plt.savefig('{}precision_recall_curve_with_threshold_excluding_zones_{}.png'.format(FIGURES_RESULTS_FOLDER, dataset_name), bbox_inches='tight')
+    plt.savefig('{}precision_recall_curve_with_threshold_excluding_zones_{}.pdf'.format(FIGURES_RESULTS_FOLDER, dataset_name), bbox_inches='tight')
     plt.clf()
 
 
@@ -127,7 +124,7 @@ def precision_recall_curve_with_threshold_by_eu_country(results_by_zone, coverag
     #fig.tight_layout()
 
 
-    plt.savefig('{}precision_recall_curve_with_threshold_by_eu_country_{}.png'.format(BASE_DIR, dataset_name), bbox_inches='tight')
-    plt.savefig('{}precision_recall_curve_with_threshold_by_eu_country_{}.pdf'.format(BASE_DIR, dataset_name), bbox_inches='tight')
+    plt.savefig('{}precision_recall_curve_with_threshold_by_eu_country_{}.png'.format(FIGURES_RESULTS_FOLDER, dataset_name), bbox_inches='tight')
+    plt.savefig('{}precision_recall_curve_with_threshold_by_eu_country_{}.pdf'.format(FIGURES_RESULTS_FOLDER, dataset_name), bbox_inches='tight')
     plt.clf()
 
