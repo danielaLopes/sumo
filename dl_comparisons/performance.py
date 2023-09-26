@@ -4,6 +4,7 @@ import datetime
 
 from math import sqrt
 import numpy as np
+import sys
 
 # pytorch version 1.13
 import torch
@@ -337,6 +338,21 @@ def deepcoffea_performance(gpu=True, batch_size=256, n_test=1000, n_wins=11, non
     print(f"(each window) tdurs_inference: {np.mean(tdurs_inference):.4f}s\n(each window) tdurs_cosine_sim: {np.mean(tdurs_cosine_sim):.4f}s")
 
 if __name__ == "__main__":
+    sol = "deepcoffea"
+    if len(sys.args) > 1:
+        sol = sys.args[1]
+
+    if sol == "deepcoffea":
+        n_pairs = [100, 1000, 10000, 20000, 30000, 40000, 50000, 60000]
+        for i in n_pairs:
+            print("n_test:", i)
+            deepcoffea_performance(gpu=True, batch_size=128, n_test=i, nonbatch=False)
+    else: # sol == "deepcorr"
+        n_pairs = [2, 4, 8, 16, 32, 64, 128, 256]
+        for i in n_pairs:
+            print("n_test:", i)
+            deepcorr_performance(gpu=True, flow_size=128, batch_size=128, n_test=i)
+
     # deepcorr_performance(gpu=True, flow_size=300, batch_size=128, n_test=300)
     # deepcoffea_performance(gpu=True, batch_size=128, n_test=1000)
     # n_pairs = [100, 1000, 10000, 20000, 30000, 40000, 50000, 60000]
@@ -346,9 +362,9 @@ if __name__ == "__main__":
     # n_pairs = [2294, 4589, 9179, 18359, 36718, 73437, 146874, 220311, 293748, 367185, 440622, 514059, 587496, 660933, 734370, 807807, 881244, 954681, 1028118, 1101555]
 
     # n_pairs = [100, 200, 300, 500, 1000, 5000, 10000, 15000, 20000, 25000, 30000, 40000, 50000, 60000]
-    n_pairs = [5000]
+    # n_pairs = [5000]
 
-    for i in n_pairs:
+    # for i in n_pairs:
         # print("n_test:", i)
         #deepcoffea_performance(gpu=True, batch_size=128, n_test=i, nonbatch=True)
-        deepcoffea_performance(gpu=True, batch_size=128, n_test=i, nonbatch=False)
+        # deepcoffea_performance(gpu=True, batch_size=128, n_test=i, nonbatch=False)
