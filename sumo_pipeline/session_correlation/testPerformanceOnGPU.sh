@@ -20,10 +20,13 @@ EOF
 
 for i in $(seq 10)
 do
+  j=0
   touch samples_subsetsum2d/sample_subsetsum2d_s$i
   for pairs in $(cat ./EXP_NB_PAIRS)
   do
+    j=$(($j + 1))
     echo " === RUN=$i PAIRS=$pairs === "
+    echo " === REPEAT $j === " >> samples_subsetsum2d/sample_subsetsum2d_s$i
     ./torpedosubsetsumopencl2d_TEST $pairs >> samples_subsetsum2d/sample_subsetsum2d_s$i
   done
 done
