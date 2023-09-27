@@ -343,7 +343,7 @@ def gather_dataset(statsFile):
 
 
 def gather_full_pipeline_dataset():
-    clientsFullPipeline = pickle.load(open('../source_separation/full_pipeline_features/client_features_source_separation_thr_0.0010103702079504728_small_OSTest.pickle', 'rb'))
+    clientsFullPipeline = pickle.load(open('../source_separation/full_pipeline_features/client_features_source_separation_thr_0.0010103702079504728_OSTest.pickle', 'rb'))
     captures = list(clientsFullPipeline.keys())
 
     x_train = pd.DataFrame(clientsFullPipeline.values())
