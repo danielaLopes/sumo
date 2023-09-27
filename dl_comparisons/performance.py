@@ -339,8 +339,8 @@ def deepcoffea_performance(gpu=True, batch_size=256, n_test=1000, n_wins=11, non
 
 if __name__ == "__main__":
     sol = "deepcoffea"
-    if len(sys.args) > 1:
-        sol = sys.args[1]
+    if len(sys.argv) > 1:
+        sol = sys.argv[1]
 
     if sol == "deepcoffea":
         n_pairs = [100, 1000, 10000, 20000, 30000, 40000, 50000, 60000]
