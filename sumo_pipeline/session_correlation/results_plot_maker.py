@@ -11,6 +11,7 @@ import glob
 import os
 
 import query_sumo_dataset
+from constants import *
 
 
 np.set_printoptions(threshold=sys.maxsize)
@@ -405,7 +406,7 @@ def precision_recall_curve_with_threshold_multiple_session_durations(figures_res
 
 
 def get_session_durations(dataset_name):
-    topPath = f"/mnt/nas-shared/torpedo/extracted_features_{dataset_name}"
+    topPath = get_captures_folder(dataset_name)
     client_file_paths = list(glob.iglob(os.path.join(topPath+'/client', '**/folderDict.pickle'), recursive=True))
 
     session_durations = []
@@ -437,7 +438,7 @@ def get_session_durations(dataset_name):
 
 
 def get_session_durations_results(results, dataset_name):
-    topPath = f"/mnt/nas-shared/torpedo/extracted_features_{dataset_name}"
+    topPath = get_captures_folder(dataset_name)
     client_file_paths = list(glob.iglob(os.path.join(topPath+'/client', '**/folderDict.pickle'), recursive=True))
 
     #print("results", results)
@@ -445,7 +446,6 @@ def get_session_durations_results(results, dataset_name):
     for test_idx, client_file_path in enumerate(client_file_paths):
         clientFolderDict = pickle.load(open(client_file_path, 'rb'))
         sessionId = clientFolderDict['clientSessionId'].split('_client')[0]
-        #print("=== sessionId", sessionId)
 
         if sessionId in results:
             fps = results[sessionId].fp
@@ -453,8 +453,6 @@ def get_session_durations_results(results, dataset_name):
             absoluteInitialTime = min(allAbsTimes)
             maxAbsoluteTime = max(allAbsTimes)
             session_duration = maxAbsoluteTime - absoluteInitialTime
-            #print("---session_duration", session_duration)
-            #print("---fps", fps)
             
             for _ in range(fps):
                 session_durations.append(session_duration)
@@ -469,7 +467,7 @@ def get_session_durations_results(results, dataset_name):
 def get_requests_per_session(data_folder, dataset_name):
     dataset = query_sumo_dataset.SumoDataset(data_folder)
     requests_per_session = {}
-    topPath = f"/mnt/nas-shared/torpedo/extracted_features_{dataset_name}"
+    topPath = get_captures_folder(dataset_name)
     client_file_paths = list(glob.iglob(os.path.join(topPath+'/client', '**/folderDict.pickle'), recursive=True))
 
     for test_idx, client_file_path in enumerate(client_file_paths):
@@ -503,7 +501,7 @@ def get_requests_per_session_results(results, data_folder):
 
 
 def get_sessions_per_os(dataset_name):
-    topPath = f"/mnt/nas-shared/torpedo/extracted_features_{dataset_name}"
+    topPath = get_captures_folder(dataset_name)
     client_file_paths = list(glob.iglob(os.path.join(topPath+'/client', '**/folderDict.pickle'), recursive=True))
     sessions_per_os = {}
     

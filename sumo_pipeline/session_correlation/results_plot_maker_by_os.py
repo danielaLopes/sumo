@@ -90,8 +90,8 @@ def plot_heatmap_fps_per_oses(figures_results_folder, results, fps, dataset_name
             matrix[os1][os2] = 0
 
      # Fill matrix with fps (positive values that were wrongly confused with another OS)
-    for osSessionId, falseSessions in fps[threshold].items():
-        os_name = osSessionId.split('_')[1]
+    for ossession_id, falseSessions in fps[threshold].items():
+        os_name = ossession_id.split('_')[1]
         os_alias = os_aliases[os_name]
         for fp in falseSessions:
             falseos_name = fp.split('_')[1]
@@ -473,21 +473,21 @@ def plot_session_concurrency_per_os(figures_results_folder, results_per_session,
     total_sessions_per_OS_all_levels = {os_name: 0 for os_name in os_aliases.values()}
 
     # Iterate over sessions
-    for sessionId, session_data in concurrent_requests.items():
-        if sessionId not in results_per_session[threshold]:
+    for session_id, session_data in concurrent_requests.items():
+        if session_id not in results_per_session[threshold]:
             continue
 
-        os_name = os_aliases[sessionId.split('_')[1]]
+        os_name = os_aliases[session_id.split('_')[1]]
 
         # Update statistics
         level = get_level(session_data['concurrent'])
         total_sessions_per_OS_all_levels[os_name] += 1
         # 'count' is the amount of flows sessions that were in a given concurrency level
         concurrency_per_onion[os_name][level]['count'] += 1
-        concurrency_per_onion[os_name][level]['tps'] += results_per_session[threshold][sessionId].tp
-        concurrency_per_onion[os_name][level]['fps'] += results_per_session[threshold][sessionId].fp
-        concurrency_per_onion[os_name][level]['tns'] += results_per_session[threshold][sessionId].tn
-        concurrency_per_onion[os_name][level]['fns'] += results_per_session[threshold][sessionId].fn
+        concurrency_per_onion[os_name][level]['tps'] += results_per_session[threshold][session_id].tp
+        concurrency_per_onion[os_name][level]['fps'] += results_per_session[threshold][session_id].fp
+        concurrency_per_onion[os_name][level]['tns'] += results_per_session[threshold][session_id].tn
+        concurrency_per_onion[os_name][level]['fns'] += results_per_session[threshold][session_id].fn
 
     # Sort onions by crescent order of total number of sessions
     oses = sorted(total_sessions_per_OS_all_levels.items(), key=lambda x: x[1])

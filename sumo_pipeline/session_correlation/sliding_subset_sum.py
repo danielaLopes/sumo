@@ -1,14 +1,24 @@
 import numpy as np
+import joblib
 import pickle
 from typing import List, Dict, Tuple, Literal
 import sys
 import os
 from tqdm import tqdm
+from tqdm.contrib import tzip
 from functools import  wraps, cached_property
 import pyopencl as cl # catch openCL exceptions
 from abc import ABC, abstractmethod
+import multiprocessing
 import logging
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
+log_format = "%(asctime)s [%(levelname)s] %(message)s"
+formatter = logging.Formatter(log_format)
+logger = logging.getLogger()
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
+logger.setLevel(logging.INFO)
 
 import generate_pairs
 import process_results
@@ -24,6 +34,8 @@ import results_plot_maker_full_pipeline
 import results_plot_maker_partial_coverage
 
 from constants import *
+
+NUM_CORES = multiprocessing.cpu_count()
 
 np.set_printoptions(threshold=sys.maxsize)
 np.set_printoptions(suppress=True)
@@ -199,6 +211,7 @@ class PreProcessedNoFullPipelineState(State):
     def get_concurrency_at_onion(self, dataset_name: str):
         concurrency_file = get_session_concurrency_at_onion_file_name(dataset_name)
         if os.path.isfile(concurrency_file):
+            #concurrent_requests = joblib.load(concurrency_file)
             concurrent_requests = pickle.load(open(concurrency_file, 'rb'))
         else:
             concurrent_requests = dataset_concurrency_analysis.get_session_concurrency_at_onions_from_features(dataset_name)
@@ -278,7 +291,6 @@ class PreProcessedFullPipelineState(State):
                                                                               self.epoch_size, 
                                                                               self.epoch_tolerance, 
                                                                               self.sss.min_session_durations)
-        pickle.dump(list(self.possible_request_combinations.keys()), open("pairs_sumo.pickle", "wb"))
 
     def __repr__(self) -> str:
         return "PreProcessedFullPipelineState"
@@ -292,7 +304,6 @@ class PreProcessedFullPipelineState(State):
     
 class PreProcessedPartialCoveragePercentageState(State):
     coverage: float
-    results_by_eu_country: Dict[float, PerformanceMetrics.PerformanceMetrics] # {coverage_percentage: PerformanceMetrics, ...}
 
     def __init__(self, 
                  sss: SlidingSubsetSum, 
@@ -311,7 +322,6 @@ class PreProcessedPartialCoveragePercentageState(State):
                          overlap, 
                          delta)
         self.coverage = coverage
-        self.results_by_eu_country = {}
 
     def toggle_state(self) -> None:
         self.sss.state = self
@@ -331,13 +341,9 @@ class PreProcessedPartialCoveragePercentageState(State):
 
     def __repr__(self) -> str:
         return f"PreProcessedPartialCoveragePercentageState ({self.coverage})"
-    
-    #def plot(self, captures_folder_test: str, dataset_name: str, threshold: float) -> None:
-    #    pass
 
 class PreProcessedPartialCoverageStateByContinent(State):
     zone: str
-    results_by_continent: Dict[str, PerformanceMetrics.PerformanceMetrics] # {zone: PerformanceMetrics, ...}
 
     def __init__(self, 
                  sss: SlidingSubsetSum, 
@@ -356,7 +362,6 @@ class PreProcessedPartialCoverageStateByContinent(State):
                          overlap, 
                          delta)
         self.zone = zone
-        self.results_by_continent = {}
 
     def toggle_state(self) -> None:
         self.sss.state = self
@@ -375,12 +380,8 @@ class PreProcessedPartialCoverageStateByContinent(State):
 
     def __repr__(self) -> str:
         return f"PreProcessedPartialCoverageStateByContinent ({self.zone})"
-    
-    #def plot(self, captures_folder_test: str, dataset_name: str, threshold: float) -> None:
-    #    pass
 
     def filter_by_zone(self, baseline_possible_request_combinations):
-        print("self.possible_request_combinations", self.possible_request_combinations)
         for _, (client_session_id, onion_session_id) in enumerate(baseline_possible_request_combinations.keys()):
             split_client_session_id = client_session_id.split('_')
             split_onion_session_id = onion_session_id.split('_')
@@ -403,11 +404,12 @@ def dump_instance_decorator(arg_index):
         def wrapper(*args, **kwargs):
             result = func(*args, **kwargs)
             
-            # Pickle dump the instance
+            # Dump the instance
             instance = args[0]  # Always needs to be used with and instance of SlidingSubsetSum
             dataset_name = args[arg_index]
             cached_filename = get_cache_filename(dataset_name)
-            logging.info(f"Storing file named \"{cached_filename}\"")
+            logging.info(f"{func.__name__} Storing file named \"{cached_filename}\"")
+            #joblib.dump(instance, cached_filename)
             with open(cached_filename, "wb") as file:
                 pickle.dump(instance, file)
 
@@ -536,9 +538,10 @@ class SlidingSubsetSum:
         cached_filename = get_cache_filename(dataset_name)
         try:
             # Try to load the cached instance
+            #instance = joblib.load(cached_filename)
             with open(cached_filename, 'rb') as cache_file:
                 instance = pickle.load(cache_file)
-                logging.info(f"Loaded existing instance named \"{cached_filename}\"")
+            logging.info(f"Loaded existing instance named \"{cached_filename}\"")
         except FileNotFoundError:
             logging.info(f"Creating new instance named \"{cached_filename}\"")
             instance = cls(dataset_name,
@@ -647,86 +650,93 @@ class SlidingSubsetSum:
 
         return score / self.state.possible_request_combinations[(client_session_id, onion_session_id)].session_windows
     
+    def __inner_predict(self, threshold: float) -> None:
+        #logging.info(f"__predict(): Evaluating threshold {threshold}")
+        self.state.predictions[threshold] = {}
+        for client_session_id, onion_session_id in self.state.possible_request_combinations.keys(): 
+            try:
+                final_score = self.__calculate_final_score(client_session_id, onion_session_id)
+            except KeyError as e:
+                if (client_session_id, onion_session_id) in self.state.possible_request_combinations:
+                    self.state.possible_request_combinations.pop((client_session_id, onion_session_id))
+                continue
+            if final_score >= threshold:
+                # predicted as correlated
+                self.state.predictions[threshold][(client_session_id, onion_session_id)] = Prediction(final_score=final_score, label=1)
+            else:
+                # predicted as not correlated
+                self.state.predictions[threshold][(client_session_id, onion_session_id)] = Prediction(final_score=final_score, label=0)
+
     @dump_instance_decorator(arg_index=1)
-    def __predict(self, dataset_name) -> None:
+    def __predict(self, dataset_name: str) -> None:
         if len(self.state.database) == 0:
             self.__run_windowed_subset_sum_on_all_pairs()
         else:
             logging.info("Already had data on database")
-
         if len(self.state.predictions) == 0:
-            keys = list(self.state.possible_request_combinations.keys())
-            for threshold in self.thresholds:
-                logging.info(f"Evaluating threshold {threshold}")
-                self.state.predictions[threshold] = {}
-                for client_session_id, onion_session_id in keys: 
-                    try:
-                        final_score = self.__calculate_final_score(client_session_id, onion_session_id)
-                    except KeyError as e:
-                        if (client_session_id, onion_session_id) in self.state.possible_request_combinations:
-                            self.state.possible_request_combinations.pop((client_session_id, onion_session_id))
-                        continue
-                    if final_score >= threshold:
-                        # predicted as correlated
-                        self.state.predictions[threshold][(client_session_id, onion_session_id)] = Prediction(final_score=final_score, label=1)
-                    else:
-                        # predicted as not correlated
-                        self.state.predictions[threshold][(client_session_id, onion_session_id)] = Prediction(final_score=final_score, label=0)
+            for threshold in tqdm(self.thresholds, desc="Predicting for each threshold ..."):
+                self.__inner_predict(threshold)
+            # with tqdm(total=len(self.thresholds), desc="Predicting for each threshold ...") as pbar:
+            #     joblib.Parallel(n_jobs=NUM_CORES)(joblib.delayed(self.__inner_predict)(threshold[0]) for threshold in tzip(self.thresholds, leave=False))
+            #     pbar.update()
         else:
             logging.info("Already had data on predictions")
+
+    def __inner_evaluate_confusion_matrix(self, i, threshold, pair_preds):
+        #print("__inner_evaluate_confusion_matrix(): Evaluating threshold {}".format(threshold))
+        self.state.metrics_map[threshold] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
+        self.state.metrics_map_final_scores[threshold] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
+        self.state.metrics_map_final_scores_per_session[threshold] = {}
+
+        for (client_session_id, onion_session_id), label_score in pair_preds.items(): 
+            if i == 0:     
+                if client_session_id not in self.state.scores_per_session_per_client:
+                    self.state.scores_per_session_per_client[client_session_id] = {}
+                self.state.scores_per_session_per_client[client_session_id][onion_session_id] = label_score.final_score
+            
+            if label_score.label == 1:
+                if client_session_id == onion_session_id:
+                    self.state.metrics_map[threshold].tp += 1
+                else:
+                    self.state.metrics_map[threshold].fp += 1     
+            else:
+                if client_session_id == onion_session_id:
+                    self.state.metrics_map[threshold].fn += 1
+                else:
+                    self.state.metrics_map[threshold].tn += 1
+        self.state.metrics_map[threshold].calculate_performance_scores()
+
+        client_sessions_with_highest_scores = process_results.count_client_correlated_sessions_highest_score(self.state.scores_per_session_per_client, threshold)
+        for client_session_id, onion_session_id in self.state.possible_request_combinations.keys():
+            if onion_session_id not in self.state.metrics_map_final_scores_per_session[threshold]:
+                self.state.metrics_map_final_scores_per_session[threshold][onion_session_id] = PerformanceMetrics.PerformanceMetrics(missed_client_flows_full_pipeline=0, missed_os_flows_full_pipeline=0)
+            if client_session_id == onion_session_id:
+                if client_sessions_with_highest_scores[client_session_id]['correlatedHighestScore']:
+                    self.state.metrics_map_final_scores[threshold].tp += 1
+                    self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].tp += 1
+                else:
+                    self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].fn += 1
+                    self.state.metrics_map_final_scores[threshold].fn += 1
+            else:
+                if client_sessions_with_highest_scores[client_session_id]['falseHighestScore'] and client_sessions_with_highest_scores[client_session_id]['falseSession'] == onion_session_id:
+                    self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].fp += 1
+                    self.state.metrics_map_final_scores[threshold].fp += 1
+                else:
+                    self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].tn += 1
+                    self.state.metrics_map_final_scores[threshold].tn += 1
+        
+        for performance_metrics in self.state.metrics_map_final_scores_per_session[threshold].values():
+            performance_metrics.calculate_performance_scores()
+        self.state.metrics_map_final_scores[threshold].calculate_performance_scores()
 
     @dump_instance_decorator(arg_index=1)
     def __evaluate_confusion_matrix(self, dataset_name) -> None:
         if len(self.state.metrics_map) == 0:
-            for i, (threshold, pair_preds) in enumerate(self.state.predictions.items()):
-                #print("Evaluating threshold {}".format(threshold))
-                self.state.metrics_map[threshold] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
-                self.state.metrics_map_final_scores[threshold] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
-                self.state.metrics_map_final_scores_per_session[threshold] = {}
-
-                for (client_session_id, onion_session_id), label_score in pair_preds.items(): 
-                    if i == 0:     
-                        if client_session_id not in self.state.scores_per_session_per_client:
-                            self.state.scores_per_session_per_client[client_session_id] = {}
-                        self.state.scores_per_session_per_client[client_session_id][onion_session_id] = label_score.final_score
-                    
-                    if label_score.label == 1:
-                        if client_session_id == onion_session_id:
-                            self.state.metrics_map[threshold].tp += 1
-                        else:
-                            self.state.metrics_map[threshold].fp += 1
-                            
-                    else:
-                        if client_session_id == onion_session_id:
-                            self.state.metrics_map[threshold].fn += 1
-                        else:
-                            self.state.metrics_map[threshold].tn += 1
-
-                self.state.metrics_map[threshold].calculate_performance_scores()
-
-                client_sessions_with_highest_scores = process_results.count_client_correlated_sessions_highest_score(self.state.scores_per_session_per_client, threshold)
-                for client_session_id, onion_session_id in self.state.possible_request_combinations.keys():
-                    if onion_session_id not in self.state.metrics_map_final_scores_per_session[threshold]:
-                        self.state.metrics_map_final_scores_per_session[threshold][onion_session_id] = PerformanceMetrics.PerformanceMetrics(missed_client_flows_full_pipeline=0, missed_os_flows_full_pipeline=0)
-                    if client_session_id == onion_session_id:
-                        if client_sessions_with_highest_scores[client_session_id]['correlatedHighestScore']:
-                            self.state.metrics_map_final_scores[threshold].tp += 1
-                            self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].tp += 1
-                        else:
-                            self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].fn += 1
-                            self.state.metrics_map_final_scores[threshold].fn += 1
-                    else:
-                        if client_sessions_with_highest_scores[client_session_id]['falseHighestScore'] and client_sessions_with_highest_scores[client_session_id]['falseSession'] == onion_session_id:
-                            self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].fp += 1
-                            self.state.metrics_map_final_scores[threshold].fp += 1
-                        else:
-                            self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].tn += 1
-                            self.state.metrics_map_final_scores[threshold].tn += 1
-                
-                for performance_metrics in self.state.metrics_map_final_scores_per_session[threshold].values():
-                    performance_metrics.calculate_performance_scores()
-                self.state.metrics_map_final_scores[threshold].calculate_performance_scores()
-            
+            for i, (threshold, pair_preds) in tqdm(enumerate(self.state.predictions.items()), desc="Evaluating confusion matrix per threshold ..."):
+                self.__inner_evaluate_confusion_matrix(i, threshold, pair_preds)
+            # with tqdm(total=len(self.thresholds), desc="Evaluating confusion matrix ...") as pbar:
+            #     joblib.Parallel(n_jobs=NUM_CORES)(joblib.delayed(self.__inner_evaluate_confusion_matrix)(i, threshold, pair_preds) for i, (threshold, pair_preds) in enumerate(tzip(self.state.predictions.items(), leave=False)))
+            #     pbar.update()
         else:
             logging.info("Already had data on evaluate_confusion_matrix()")
 
@@ -852,20 +862,12 @@ class SlidingSubsetSum:
             os.mkdir(RESULTS_FOLDER)
         if not os.path.isdir(DATA_RESULTS_FOLDER):
             os.mkdir(DATA_RESULTS_FOLDER)
-
         self.__pre_process(dataset_name, is_full_pipeline)
-        logging.info("\n--- After pre_process")
         self.__predict(dataset_name)
-        logging.info("\n--- After predict")
-        
         self.__evaluate_confusion_matrix(dataset_name)
-        logging.info("\n--- After evaluate_confusion_matrix")
         self.__evaluate_by_duration(dataset_name, is_full_pipeline=is_full_pipeline)
-        logging.info("\n--- After evaluate_by_duration")
         self.__evaluate_by_client(dataset_name)
-        logging.info("\n--- After evaluate_by_client")
         self.__evaluate_by_os(dataset_name)
-        logging.info("\n--- After evaluate_by_os")
 
     def plot_paper_results(self, captures_folder_test: str, dataset_name: str) -> None:
         chosen_threshold = 0
@@ -890,54 +892,48 @@ class SlidingSubsetSum:
         for zone, percentage in self.coverage_percentages.items():
             self.pre_processed_partial_coverage_percentage_states_by_coverage[percentage].toggle_state()
             if len(self.state.possible_request_combinations) == 0:
-                #self.state.pre_process()
                 self.__pre_process_state(dataset_name)
-            if len(self.state.results_by_eu_country) == 0:
-                #for zone, percentage in self.coverage_percentage.items():
+            if len(self.state.metrics_map_final_scores) == 0:
                 logging.info(f"Analyzing zone: {zone}")
                 self.__predict(dataset_name)
                 self.__evaluate_confusion_matrix(dataset_name)
-
-                for threshold in self.state.results_by_zone[percentage].keys():
-                    self.state.results_by_zone[percentage][threshold].calculate_performance_scores()
 
         # Group results from all states
         results_by_eu_country = {}
         for zone, percentage in self.coverage_percentages.items():
             results_by_eu_country[percentage] = self.state.results_by_zone
         self.pre_processed_partial_coverage_percentage_states_by_coverage[1].plot()
-        results_plot_maker_partial_coverage.precision_recall_curve_with_threshold_by_eu_country(self.results_by_eu_country, self.coverage_percentage.values(), dataset_name)
+        results_plot_maker_partial_coverage.precision_recall_curve_with_threshold_by_eu_country(self.metrics_map_final_scores, self.coverage_percentage.values(), dataset_name)
 
     @dump_instance_decorator(arg_index=1)
-    def __filter_by_zone_state(self, 
-                               dataset_name: str) -> None:
+    def __filter_by_zone_state(self, dataset_name: str) -> None:
         self.state.filter_by_zone(self.pre_processed_partial_coverage_states_by_continent['baseline'].possible_request_combinations)
 
     @dump_instance_decorator(arg_index=1)
     def evaluate_coverage_by_continent(self, dataset_name: str):
         self.pre_processed_partial_coverage_states_by_continent['baseline'].toggle_state()
         if len(self.state.possible_request_combinations) == 0:
-            #self.state.pre_process()
             self.__pre_process_state(dataset_name)
+        else:
+            logging.info(f"Loaded existing baseline pairs")
         for zone in self.zones_without_baseline:
             self.pre_processed_partial_coverage_states_by_continent[zone].toggle_state()
-            print(f"self.state: {self.state}")
-            print(f"baseline requests: {len(self.pre_processed_partial_coverage_states_by_continent['baseline'].possible_request_combinations)}")
-            self.__filter_by_zone_state(dataset_name)
+            if len(self.state.possible_request_combinations) == 0:
+                self.__filter_by_zone_state(dataset_name)
+            else:
+                logging.info(f"Loaded existing pairs for excluding {zone}")
         for zone in self.zones:
             self.pre_processed_partial_coverage_states_by_continent[zone].toggle_state()
-            if len(self.state.results_by_continent) == 0:
-                logging.info(f"\n====== Analyzing continents: {zone}")
+            if len(self.state.metrics_map_final_scores) == 0:
+                logging.info(f"Analyzing continents: {zone}")
                 self.__predict(dataset_name)
                 self.__evaluate_confusion_matrix(dataset_name)
-
-                for threshold in self.state.results_by_continent.keys():
-                    self.state.results_by_continent[threshold].calculate_performance_scores()
-
+            else:
+                logging.info(f"Loaded existing results for excluding {zone}")
         # Group results from all states
         results_by_continent = {}
         for zone in self.zones:
             self.pre_processed_partial_coverage_states_by_continent[zone].toggle_state()
-            results_by_continent[zone] = self.state.results_by_continent
+            results_by_continent[zone] = self.state.metrics_map_final_scores
         self.pre_processed_partial_coverage_states_by_continent['baseline'].plot()
         results_plot_maker_partial_coverage.precision_recall_curve_with_threshold_excluding_zones(results_by_continent, dataset_name)
