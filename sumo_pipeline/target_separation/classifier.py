@@ -211,11 +211,11 @@ def optimal_threshold(tpr, fpr, thresholds):
 def get_tpr_fpr_threshold_preds(probabilities, y_test, threshold=THRESHOLD):
     #threshold = 0.9
     threshold_vector = np.greater_equal(probabilities, threshold).astype(int)
-    print("---- threshold {}".format(threshold))
+    #print("---- threshold {}".format(threshold))
     tpr, fpr, precision, recall = true_false_positive(threshold_vector, y_test)
-    print("tpr {}; fpr {}; precision {}; recall {}".format(tpr, fpr, precision, recall))
+    #print("tpr {}; fpr {}; precision {}; recall {}".format(tpr, fpr, precision, recall))
 
-    print("COUNT OCCURRENCES", np.count_nonzero(threshold_vector == 1))
+    #print("COUNT OCCURRENCES", np.count_nonzero(threshold_vector == 1))
     return threshold_vector
 
 
