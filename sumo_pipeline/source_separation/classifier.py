@@ -23,7 +23,8 @@ sklearn.set_config(assume_finite=True)
 LABEL_INDEX = -2
 CAPTURE_INDEX = -1
 
-DECISION_THRESHOLD = 0.9
+#DECISION_THRESHOLD = 0.9
+DECISION_THRESHOLD = 0.002577161882072687 # For reproducibility
 
 models_folder = 'models/'
 

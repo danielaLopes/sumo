@@ -116,7 +116,8 @@ def test_full_pipeline(dataset_name: str,
         $ python3 app.py test-full-pipeline OSTest /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSTest/stats_source_separation.csv models/source_separation_model_bayesian_optimization.joblib
     """
     typer.echo("Testing model with full pipeline data ...")
-    classifier.test_full_pipeline(dataset_name, stats_file_test, model_save_file_validate, optimal_thr=True)
+    #classifier.test_full_pipeline(dataset_name, stats_file_test, model_save_file_validate, optimal_thr=True)
+    classifier.test_full_pipeline(dataset_name, stats_file_test, model_save_file_validate, optimal_thr=False)
 
 
 if __name__ == "__main__":
