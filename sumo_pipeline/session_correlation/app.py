@@ -1,4 +1,8 @@
 import typer
+import multiprocessing
+import os
+# Set max threads to avoid safe limit from being established
+os.environ['NUMEXPR_MAX_THREADS'] = str(multiprocessing.cpu_count())
 
 import sliding_subset_sum
 import results_plot_maker

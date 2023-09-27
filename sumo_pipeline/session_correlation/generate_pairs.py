@@ -1,8 +1,5 @@
 from http.client import CONTINUE
-import dpkt
-import socket
 import numpy as np
-#import pickle
 import dill as pickle
 import os
 from tqdm import tqdm
@@ -229,10 +226,14 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
             session_id = client_session_id.split("_hs.pcap")[0]
 
         if session_id in client_flows:
+            if session_id in 'client-small-ostest-1-client1_os4-os-small-ostest-3_i4bukbaeqkl2mjhkgg4rrxbjuvevdz447vbmzqrvqsmi6zmi2jax5ayd_session_1527':
+                print("---> Continued in client")
             continue
         
         # Onion-side flow was mistaken as a client-side flow in the filtering phase
         if '_hs.pcap' in client_session_id:
+            if 'client-small-ostest-1-client1_os4-os-small-ostest-3_i4bukbaeqkl2mjhkgg4rrxbjuvevdz447vbmzqrvqsmi6zmi2jax5ayd_session_1527' in client_session_id:
+                print("---> _hs.pcap")
             client_session_id_split = client_session_id.split("_")
             client_folder = client_session_id_split[1].split("-ostest-")[0]
             client_extracted_features_folder = get_extracted_features_folder(top_path, "onion", client_folder, client_session_id)
@@ -260,10 +261,14 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
             session_id = onion_session_id.split("_hs.pcap")[0]
 
         if session_id in onion_flows:
+            if session_id in 'client-small-ostest-4-client4_os1-os-small-ostest-1_wy5euy7j7zayx6xpgzczqdvidl7dtmrm5bwqzhnhapmwfxhbk4kbklqd_session_1301':
+                print("---> Continued in onion")
             continue
         
         # Client-side flow was mistaken as an onion-side flow in the filtering phase
         if '_client.pcap' in onion_session_id:
+            if 'client-small-ostest-4-client4_os1-os-small-ostest-1_wy5euy7j7zayx6xpgzczqdvidl7dtmrm5bwqzhnhapmwfxhbk4kbklqd_session_1301' in client_session_id:
+                print("---> _client.pcap")
             onion_session_id_split = onion_session_id.split("_")
             client_folder = onion_session_id_split[0]
             onion_extracted_features_folder = get_extracted_features_folder(top_path, "client", client_folder, onion_session_id)
@@ -301,8 +306,6 @@ def process_correlated_pair(client_file_path: str,
     onion_file_path = f"{onion_extracted_features_folder}folderDict.pickle"
     # This prevents also getting alexa flows
     if not os.path.isfile(onion_file_path):
-        #if 'alexa' not in onion_file_path:
-        #    print("----> onion_file_path", onion_file_path)
         return None, None, None
     onion_folder_dict = pickle.load(open(onion_file_path, 'rb'))
 
@@ -331,6 +334,9 @@ def inner_process_uncorrelated_pair(client_flow: flows.ClientFlow,
     os_initial_epoch = onion_flow.first_ts // epoch_size
     os_last_epoch = (onion_flow.last_ts // epoch_size) + 1
 
+    if client_session_id in 'client-small-ostest-1-client1_os4-os-small-ostest-3_i4bukbaeqkl2mjhkgg4rrxbjuvevdz447vbmzqrvqsmi6zmi2jax5ayd_session_1527' and onion_session_id in 'client-small-ostest-4-client4_os1-os-small-ostest-1_wy5euy7j7zayx6xpgzczqdvidl7dtmrm5bwqzhnhapmwfxhbk4kbklqd_session_1301':
+        print(f"---> Initial epoch: {initial_epoch}; last_epoch: {last_epoch}; os_initial_epoch: {os_initial_epoch}; os_last_epoch: {os_last_epoch}")
+
     possible_request_combinations_tmp: Dict[Tuple[str, str], flows.FlowPair] = {} # {(client_session_id, onion_session_id): FlowPair, ...}
     
     #(StartDate1 <= EndDate2) and (StartDate2 <= EndDate1)
@@ -343,6 +349,8 @@ def inner_process_uncorrelated_pair(client_flow: flows.ClientFlow,
         else:
             # remove duplicated captures from same OS
             onion_name = onion_session_id.split("_")[1]
+            if client_session_id in 'client-small-ostest-1-client1_os4-os-small-ostest-3_i4bukbaeqkl2mjhkgg4rrxbjuvevdz447vbmzqrvqsmi6zmi2jax5ayd_session_1527' and onion_session_id in 'client-small-ostest-4-client4_os1-os-small-ostest-1_wy5euy7j7zayx6xpgzczqdvidl7dtmrm5bwqzhnhapmwfxhbk4kbklqd_session_1301':
+                print(f"---> onion_name: {onion_name}", )
             if onion_name in client_session_id:
                 return None
         
@@ -405,16 +413,12 @@ def process_features_epochs_sessions(dataset_name: str,
     top_path = f"/mnt/nas-shared/torpedo/extracted_features/extracted_features_{dataset_name}"
     client_file_paths = list(glob.iglob(os.path.join(top_path+'/client', '**/folderDict.pickle'), recursive=True))
 
-    #print("\n==== len(client_file_paths)", len(client_file_paths))
-    # TODO: PARALLELIZE
     results = []
-    for test_idx, client_file_path in tqdm(enumerate(client_file_paths), desc="Getting pairs features ..."):
-        results.append(process_correlated_pair(client_file_path, time_sampling_interval, top_path))
-    """
+    # for test_idx, client_file_path in tqdm(enumerate(client_file_paths), desc="Getting pairs features ..."):
+    #     results.append(process_correlated_pair(client_file_path, time_sampling_interval, top_path))
     with tqdm(total=len(client_file_paths), desc="Getting correlated pairs features ...") as pbar:
         results = Parallel(n_jobs=NUM_CORES)(delayed(process_correlated_pair)(client_file_path[0], time_sampling_interval, top_path) for client_file_path in tzip(client_file_paths, leave=False))
         pbar.update()
-    """
     count_eliminated = 0
     for session_id, client_dict, onion_dict in results:
         if session_id is None:

@@ -1,14 +1,24 @@
 import numpy as np
 import joblib
+import pickle
 from typing import List, Dict, Tuple, Literal
 import sys
 import os
 from tqdm import tqdm
+from tqdm.contrib import tzip
 from functools import  wraps, cached_property
 import pyopencl as cl # catch openCL exceptions
 from abc import ABC, abstractmethod
+import multiprocessing
 import logging
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
+log_format = "%(asctime)s [%(levelname)s] %(message)s"
+formatter = logging.Formatter(log_format)
+logger = logging.getLogger()
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
+logger.setLevel(logging.INFO)
 
 import generate_pairs
 import process_results
@@ -24,6 +34,8 @@ import results_plot_maker_full_pipeline
 import results_plot_maker_partial_coverage
 
 from constants import *
+
+NUM_CORES = multiprocessing.cpu_count()
 
 np.set_printoptions(threshold=sys.maxsize)
 np.set_printoptions(suppress=True)
@@ -199,7 +211,8 @@ class PreProcessedNoFullPipelineState(State):
     def get_concurrency_at_onion(self, dataset_name: str):
         concurrency_file = get_session_concurrency_at_onion_file_name(dataset_name)
         if os.path.isfile(concurrency_file):
-            concurrent_requests = joblib.load(concurrency_file)
+            #concurrent_requests = joblib.load(concurrency_file)
+            concurrent_requests = pickle.load(open(concurrency_file, 'rb'))
         else:
             concurrent_requests = dataset_concurrency_analysis.get_session_concurrency_at_onions_from_features(dataset_name)
         return concurrent_requests
@@ -395,8 +408,10 @@ def dump_instance_decorator(arg_index):
             instance = args[0]  # Always needs to be used with and instance of SlidingSubsetSum
             dataset_name = args[arg_index]
             cached_filename = get_cache_filename(dataset_name)
-            logging.info(f"Storing file named \"{cached_filename}\"")
-            joblib.dump(instance, cached_filename)
+            logging.info(f"{func.__name__} Storing file named \"{cached_filename}\"")
+            #joblib.dump(instance, cached_filename)
+            with open(cached_filename, "wb") as file:
+                pickle.dump(instance, file)
 
             return result
         return wrapper
@@ -523,7 +538,9 @@ class SlidingSubsetSum:
         cached_filename = get_cache_filename(dataset_name)
         try:
             # Try to load the cached instance
-            instance = joblib.load(cached_filename)
+            #instance = joblib.load(cached_filename)
+            with open(cached_filename, 'rb') as cache_file:
+                instance = pickle.load(cache_file)
             logging.info(f"Loaded existing instance named \"{cached_filename}\"")
         except FileNotFoundError:
             logging.info(f"Creating new instance named \"{cached_filename}\"")
@@ -633,84 +650,93 @@ class SlidingSubsetSum:
 
         return score / self.state.possible_request_combinations[(client_session_id, onion_session_id)].session_windows
     
+    def __inner_predict(self, threshold: float) -> None:
+        #logging.info(f"__predict(): Evaluating threshold {threshold}")
+        self.state.predictions[threshold] = {}
+        for client_session_id, onion_session_id in self.state.possible_request_combinations.keys(): 
+            try:
+                final_score = self.__calculate_final_score(client_session_id, onion_session_id)
+            except KeyError as e:
+                if (client_session_id, onion_session_id) in self.state.possible_request_combinations:
+                    self.state.possible_request_combinations.pop((client_session_id, onion_session_id))
+                continue
+            if final_score >= threshold:
+                # predicted as correlated
+                self.state.predictions[threshold][(client_session_id, onion_session_id)] = Prediction(final_score=final_score, label=1)
+            else:
+                # predicted as not correlated
+                self.state.predictions[threshold][(client_session_id, onion_session_id)] = Prediction(final_score=final_score, label=0)
+
     @dump_instance_decorator(arg_index=1)
-    def __predict(self, dataset_name) -> None:
+    def __predict(self, dataset_name: str) -> None:
         if len(self.state.database) == 0:
             self.__run_windowed_subset_sum_on_all_pairs()
         else:
             logging.info("Already had data on database")
-
         if len(self.state.predictions) == 0:
-            keys = list(self.state.possible_request_combinations.keys())
-            for threshold in self.thresholds:
-                logging.info(f"Evaluating threshold {threshold}")
-                self.state.predictions[threshold] = {}
-                for client_session_id, onion_session_id in keys: 
-                    try:
-                        final_score = self.__calculate_final_score(client_session_id, onion_session_id)
-                    except KeyError as e:
-                        if (client_session_id, onion_session_id) in self.state.possible_request_combinations:
-                            self.state.possible_request_combinations.pop((client_session_id, onion_session_id))
-                        continue
-                    if final_score >= threshold:
-                        # predicted as correlated
-                        self.state.predictions[threshold][(client_session_id, onion_session_id)] = Prediction(final_score=final_score, label=1)
-                    else:
-                        # predicted as not correlated
-                        self.state.predictions[threshold][(client_session_id, onion_session_id)] = Prediction(final_score=final_score, label=0)
+            for threshold in tqdm(self.thresholds, desc="Predicting for each threshold ..."):
+                self.__inner_predict(threshold)
+            # with tqdm(total=len(self.thresholds), desc="Predicting for each threshold ...") as pbar:
+            #     joblib.Parallel(n_jobs=NUM_CORES)(joblib.delayed(self.__inner_predict)(threshold[0]) for threshold in tzip(self.thresholds, leave=False))
+            #     pbar.update()
         else:
             logging.info("Already had data on predictions")
+
+    def __inner_evaluate_confusion_matrix(self, i, threshold, pair_preds):
+        #print("__inner_evaluate_confusion_matrix(): Evaluating threshold {}".format(threshold))
+        self.state.metrics_map[threshold] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
+        self.state.metrics_map_final_scores[threshold] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
+        self.state.metrics_map_final_scores_per_session[threshold] = {}
+
+        for (client_session_id, onion_session_id), label_score in pair_preds.items(): 
+            if i == 0:     
+                if client_session_id not in self.state.scores_per_session_per_client:
+                    self.state.scores_per_session_per_client[client_session_id] = {}
+                self.state.scores_per_session_per_client[client_session_id][onion_session_id] = label_score.final_score
+            
+            if label_score.label == 1:
+                if client_session_id == onion_session_id:
+                    self.state.metrics_map[threshold].tp += 1
+                else:
+                    self.state.metrics_map[threshold].fp += 1     
+            else:
+                if client_session_id == onion_session_id:
+                    self.state.metrics_map[threshold].fn += 1
+                else:
+                    self.state.metrics_map[threshold].tn += 1
+        self.state.metrics_map[threshold].calculate_performance_scores()
+
+        client_sessions_with_highest_scores = process_results.count_client_correlated_sessions_highest_score(self.state.scores_per_session_per_client, threshold)
+        for client_session_id, onion_session_id in self.state.possible_request_combinations.keys():
+            if onion_session_id not in self.state.metrics_map_final_scores_per_session[threshold]:
+                self.state.metrics_map_final_scores_per_session[threshold][onion_session_id] = PerformanceMetrics.PerformanceMetrics(missed_client_flows_full_pipeline=0, missed_os_flows_full_pipeline=0)
+            if client_session_id == onion_session_id:
+                if client_sessions_with_highest_scores[client_session_id]['correlatedHighestScore']:
+                    self.state.metrics_map_final_scores[threshold].tp += 1
+                    self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].tp += 1
+                else:
+                    self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].fn += 1
+                    self.state.metrics_map_final_scores[threshold].fn += 1
+            else:
+                if client_sessions_with_highest_scores[client_session_id]['falseHighestScore'] and client_sessions_with_highest_scores[client_session_id]['falseSession'] == onion_session_id:
+                    self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].fp += 1
+                    self.state.metrics_map_final_scores[threshold].fp += 1
+                else:
+                    self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].tn += 1
+                    self.state.metrics_map_final_scores[threshold].tn += 1
+        
+        for performance_metrics in self.state.metrics_map_final_scores_per_session[threshold].values():
+            performance_metrics.calculate_performance_scores()
+        self.state.metrics_map_final_scores[threshold].calculate_performance_scores()
 
     @dump_instance_decorator(arg_index=1)
     def __evaluate_confusion_matrix(self, dataset_name) -> None:
         if len(self.state.metrics_map) == 0:
-            for i, (threshold, pair_preds) in enumerate(self.state.predictions.items()):
-                #print("Evaluating threshold {}".format(threshold))
-                self.state.metrics_map[threshold] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
-                self.state.metrics_map_final_scores[threshold] = PerformanceMetrics.PerformanceMetrics(self.state.missed_client_flows, self.state.missed_os_flows)
-                self.state.metrics_map_final_scores_per_session[threshold] = {}
-
-                for (client_session_id, onion_session_id), label_score in pair_preds.items(): 
-                    if i == 0:     
-                        if client_session_id not in self.state.scores_per_session_per_client:
-                            self.state.scores_per_session_per_client[client_session_id] = {}
-                        self.state.scores_per_session_per_client[client_session_id][onion_session_id] = label_score.final_score
-                    
-                    if label_score.label == 1:
-                        if client_session_id == onion_session_id:
-                            self.state.metrics_map[threshold].tp += 1
-                        else:
-                            self.state.metrics_map[threshold].fp += 1     
-                    else:
-                        if client_session_id == onion_session_id:
-                            self.state.metrics_map[threshold].fn += 1
-                        else:
-                            self.state.metrics_map[threshold].tn += 1
-                self.state.metrics_map[threshold].calculate_performance_scores()
-
-                client_sessions_with_highest_scores = process_results.count_client_correlated_sessions_highest_score(self.state.scores_per_session_per_client, threshold)
-                for client_session_id, onion_session_id in self.state.possible_request_combinations.keys():
-                    if onion_session_id not in self.state.metrics_map_final_scores_per_session[threshold]:
-                        self.state.metrics_map_final_scores_per_session[threshold][onion_session_id] = PerformanceMetrics.PerformanceMetrics(missed_client_flows_full_pipeline=0, missed_os_flows_full_pipeline=0)
-                    if client_session_id == onion_session_id:
-                        if client_sessions_with_highest_scores[client_session_id]['correlatedHighestScore']:
-                            self.state.metrics_map_final_scores[threshold].tp += 1
-                            self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].tp += 1
-                        else:
-                            self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].fn += 1
-                            self.state.metrics_map_final_scores[threshold].fn += 1
-                    else:
-                        if client_sessions_with_highest_scores[client_session_id]['falseHighestScore'] and client_sessions_with_highest_scores[client_session_id]['falseSession'] == onion_session_id:
-                            self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].fp += 1
-                            self.state.metrics_map_final_scores[threshold].fp += 1
-                        else:
-                            self.state.metrics_map_final_scores_per_session[threshold][onion_session_id].tn += 1
-                            self.state.metrics_map_final_scores[threshold].tn += 1
-                
-                for performance_metrics in self.state.metrics_map_final_scores_per_session[threshold].values():
-                    performance_metrics.calculate_performance_scores()
-                self.state.metrics_map_final_scores[threshold].calculate_performance_scores()
-            
+            for i, (threshold, pair_preds) in tqdm(enumerate(self.state.predictions.items()), desc="Evaluating confusion matrix per threshold ..."):
+                self.__inner_evaluate_confusion_matrix(i, threshold, pair_preds)
+            # with tqdm(total=len(self.thresholds), desc="Evaluating confusion matrix ...") as pbar:
+            #     joblib.Parallel(n_jobs=NUM_CORES)(joblib.delayed(self.__inner_evaluate_confusion_matrix)(i, threshold, pair_preds) for i, (threshold, pair_preds) in enumerate(tzip(self.state.predictions.items(), leave=False)))
+            #     pbar.update()
         else:
             logging.info("Already had data on evaluate_confusion_matrix()")
 
