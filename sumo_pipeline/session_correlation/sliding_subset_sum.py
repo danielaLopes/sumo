@@ -864,10 +864,10 @@ class SlidingSubsetSum:
         self.__evaluate_by_client(dataset_name)
         self.__evaluate_by_os(dataset_name)
 
-    def plot_paper_results(self, captures_folder_test: str, dataset_name: str) -> None:
+    def plot_paper_results(self, dataset_name: str) -> None:
         chosen_threshold = 0
         self.pre_processed_no_full_pipeline_state.toggle_state()
-        self.state.plot_paper_results(captures_folder_test, dataset_name, self.thresholds[chosen_threshold])
+        self.state.plot_paper_results(dataset_name, self.thresholds[chosen_threshold])
 
     def plot(self, captures_folder_test: str, dataset_name: str) -> None:
         chosen_threshold = 0
