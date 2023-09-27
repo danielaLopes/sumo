@@ -217,7 +217,7 @@ class PreProcessedNoFullPipelineState(State):
             concurrent_requests = dataset_concurrency_analysis.get_session_concurrency_at_onions_from_features(dataset_name)
         return concurrent_requests
     
-    def plot_paper_results(self, captures_folder_test: str, dataset_name: str, threshold: float) -> None:
+    def plot_paper_results(self, dataset_name: str, threshold: float) -> None:
         super().plot()
 
         concurrent_requests = self.get_concurrency_at_onion(dataset_name)
@@ -228,9 +228,6 @@ class PreProcessedNoFullPipelineState(State):
 
         # precision_recall_curve_with_threshold_multiple_session_durations.pdf
         results_plot_maker.precision_recall_curve_with_threshold_multiple_session_durations(FIGURES_PAPER_RESULTS_FOLDER, self.results_by_min_duration, self.flow_count_by_duration_correlated, dataset_name) 
-
-        # session_results_statistics_cdfs.pdf
-        results_plot_maker.session_results_statistics(FIGURES_PAPER_RESULTS_FOLDER, self.metrics_map_final_scores_per_session, captures_folder_test, dataset_name, threshold=threshold)
 
     def plot(self, captures_folder_test: str, dataset_name: str, threshold: float) -> None:
         super().plot()
@@ -393,7 +390,7 @@ def get_cache_filename(dataset_name):
         os.mkdir(RESULTS_FOLDER)
     if not os.path.isdir(DATA_RESULTS_FOLDER):
         os.mkdir(DATA_RESULTS_FOLDER)
-        
+
     return f"{DATA_RESULTS_FOLDER}sliding_subset_sum_{dataset_name}.pickle"
 
 def dump_instance_decorator(arg_index):
@@ -576,9 +573,9 @@ class SlidingSubsetSum:
                     window_size: {self.pre_processed_full_pipeline_state.window_size};
                     overlap: {self.pre_processed_full_pipeline_state.overlap};
                     delta: {self.pre_processed_full_pipeline_state.delta}\n
-                    current state: {self.state}\n
-                    # pairs of flows: {len(self.state.possible_request_combinations)}\n
                     """
+                    # current state: {self.state}\n
+                    # pairs of flows: {len(self.state.possible_request_combinations)}\n
                     # # client flows: {len(self.state.client_flows)}\n
                     # # onion flows: {len(self.state.onion_flows)}\n
                     
@@ -589,7 +586,7 @@ class SlidingSubsetSum:
             self.pre_processed_no_full_pipeline_state.toggle_state()
         else:
             self.pre_processed_full_pipeline_state.toggle_state()
-        logging.info(f"Toggled state {self.state}")
+        #logging.info(f"Toggled state {self.state}")
 
         if len(self.state.possible_request_combinations) == 0:
             self.state.pre_process()

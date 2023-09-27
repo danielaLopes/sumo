@@ -14,3 +14,5 @@ gunzip extracted_features.tar.gz
 tar -xf extracted_features.tar
 
 
+echo "Obtaining subsetsumopencl2d.so ..."
+# TODO: 
