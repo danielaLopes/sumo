@@ -9,7 +9,7 @@ avg_times = []
 avg_throughput = []
 stddev_times = []
 stddev_throughput = []
-sol = ["subsetsum2d", "deepcorr", "deepcoffea"]
+sol = ["subsetsum2d", "deepcoffea"]
 folder = "."
 nb_samples = 2
 
@@ -77,14 +77,15 @@ ax.spines['right'].set_visible(False)
 # ax.set_title("Torpedo Correlator", fontsize=24)
 # ax.errorbar(avg_throughput[0], avg_times[0], xerr=stddev_throughput[0], yerr=stddev_times[0], label="subset-sum", linestyle='-', marker='o', color='b')
 
-sol = ["DC", "DCF", "SUMo"]
-idx = [1, 2, 0]
-color = ["blue", "green", "red"]
-marker = ["o", "t", "x"]
-# sol = ["SUMo"]
-# idx = [0]
-# color = ["red"]
-# marker = ["x"]
+sol = ["DCF", "SUMo"]
+idx = [1, 0]
+color = ["blue", "red"]
+marker = ["o", "x"]
+# sol = ["DC", "DCF", "SUMo"]
+# idx = [1, 2, 0]
+# color = ["blue", "green", "red"]
+# marker = ["o", "t", "x"]
+
 
 # first point looks like an outlier
 #avg_throughput[1] = avg_throughput[1][1:]
