@@ -24,7 +24,7 @@ LABEL_INDEX = -2
 CAPTURE_INDEX = -1
 
 #DECISION_THRESHOLD = 0.9
-DECISION_THRESHOLD = 0.002577161882072687 # For reproducibility
+DECISION_THRESHOLD = 0.0010103702079504728 # For reproducibility
 
 models_folder = 'models/'
 
@@ -362,9 +362,10 @@ def test_full_pipeline(dataset_name, statsFileTest, model_save_file, optimal_thr
 
     if optimal_thr == True:
         decision_threshold = optimal_threshold(tpr, fpr, thresholds)
-        print("decision_threshold", decision_threshold)
+        print(f"Using optimized decision threshold {decision_threshold}")
     else:
         decision_threshold = DECISION_THRESHOLD
+        print(f"Using default decision threshold {decision_threshold}")
 
     dump_pipeline_features(dataset_name, X_test, probas_[:, 1], test_captures, decision_threshold)
     
