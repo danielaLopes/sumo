@@ -16,7 +16,7 @@ def train(stats_file_train: str, model_save_file: str) -> None:
                                         without hyperparameter tuning.
 
     Example:
-        $ python3 app.py train /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSTrain/stats_target_separation.csv target_separation_model.joblib
+        $ python3 app.py train /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSTrain/stats_target_separation.csv models/target_separation_model.joblib
     """
     typer.echo("Training model ...")
     classifier.train(stats_file_train, model_save_file)
@@ -51,7 +51,7 @@ def test_standalone(stats_file_test: str,
                                         with hyperparameter tuning.
 
     Example:
-        $ python3 app.py test-standalone /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSTest/stats_target_separation.csv target_separation_model_bayesian_optimization.joblib
+        $ python3 app.py test-standalone /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSTest/stats_target_separation.csv models/target_separation_model_bayesian_optimization.joblib
     """
     typer.echo("Testing model ...")
     classifier.test(stats_file_test, model_save_file_validate)
@@ -71,7 +71,7 @@ def plot(stats_file_test: str,
         results_file (str): The path save the precision-recall curve plot.
 
     Example:
-        $ python3 app.py plot /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSTest/stats_target_separation.csv target_separation_model.joblib precision_recall_curve_target_separation_zoomin
+        $ python3 app.py plot /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSTest/stats_target_separation.csv models/target_separation_model.joblib precision_recall_curve_target_separation_zoomin
     """
     typer.echo("Plotting precision-recall curve without validation results ...")
     classifier.plot_precision_recall_curve_zoomin(stats_file_test, model_save_file, results_file)
@@ -91,7 +91,7 @@ def plot_validate(stats_file_test: str,
         results_file_validate (str): The path save the precision-recall curve plot.
 
     Example:
-        $ python3 app.py plot-validate /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSTest/stats_target_separation.csv target_separation_model_bayesian_optimization.joblib precision_recall_curve_target_separation_hyperparameter_tuning_zoomin
+        $ python3 app.py plot-validate /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSTest/stats_target_separation.csv models/target_separation_model_bayesian_optimization.joblib precision_recall_curve_target_separation_hyperparameter_tuning_zoomin
     """
     typer.echo("Plotting precision-recall curve with validation results ...")
     classifier.plot_precision_recall_curve_zoomin(stats_file_test, model_save_file_validate, results_file_validate)
@@ -111,7 +111,7 @@ def test_full_pipeline(dataset_name: str,
                                         with hyperparameter tuning.
 
     Example:
-        $ python3 app.py test-full-pipeline OSTest target_separation_model_bayesian_optimization.joblib
+        $ python3 app.py test-full-pipeline OSTest models/target_separation_model_bayesian_optimization.joblib
     """
     typer.echo("Testing model with full pipeline data ...")
     classifier.test_full_pipeline(dataset_name, model_save_file_validate)

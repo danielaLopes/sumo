@@ -389,6 +389,11 @@ class PreProcessedPartialCoverageStateByContinent(State):
                 self.possible_request_combinations[(client_session_id, onion_session_id)] = baseline_possible_request_combinations[(client_session_id, onion_session_id)]
 
 def get_cache_filename(dataset_name):
+    if not os.path.isdir(RESULTS_FOLDER):
+        os.mkdir(RESULTS_FOLDER)
+    if not os.path.isdir(DATA_RESULTS_FOLDER):
+        os.mkdir(DATA_RESULTS_FOLDER)
+        
     return f"{DATA_RESULTS_FOLDER}sliding_subset_sum_{dataset_name}.pickle"
 
 def dump_instance_decorator(arg_index):
@@ -855,10 +860,6 @@ class SlidingSubsetSum:
             logging.info("Already had data on evaluate_by_os()")
 
     def correlate_sessions(self, dataset_name, is_full_pipeline=False) -> None:
-        if not os.path.isdir(RESULTS_FOLDER):
-            os.mkdir(RESULTS_FOLDER)
-        if not os.path.isdir(DATA_RESULTS_FOLDER):
-            os.mkdir(DATA_RESULTS_FOLDER)
         self.__pre_process(dataset_name, is_full_pipeline)
         self.__predict(dataset_name)
         self.__evaluate_confusion_matrix(dataset_name)

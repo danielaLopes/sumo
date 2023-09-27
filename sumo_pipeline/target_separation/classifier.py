@@ -221,9 +221,9 @@ def get_tpr_fpr_threshold_preds(probabilities, y_test, threshold=THRESHOLD):
 
 def plot_precision_recall_curve_zoomin(stats_file_test, model_save_file, results_file):
     
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
-        model = joblib.load(models_folder+model_save_file)
+        model = joblib.load(model_save_file)
     else:
         print("You have to train target separation's model first!")
         print("Exiting ...")
@@ -397,9 +397,9 @@ def hyperparameter_tuning(plFileTrain, statsFileTrain, plFileValidate, statsFile
 
 def test(stats_file_test, model_save_file):
 
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
-        model = joblib.load(models_folder+model_save_file)
+        model = joblib.load(model_save_file)
     else:
         print("You have to train target separation's model first!")
         print("Exiting ...")
@@ -417,9 +417,9 @@ def test(stats_file_test, model_save_file):
 
 def test_full_pipeline(dataset_name, model_save_file):
 
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
-        model = joblib.load(models_folder+model_save_file)
+        model = joblib.load(model_save_file)
     else:
         print("You have to train and test target separation's model and train target separation's model first!")
         print("Exiting ...")

@@ -227,9 +227,9 @@ def plot_precision_recall_curve(y_test, probas_, isValidation=False):
 
 def plot_precision_recall_curve_zoomin(statsFileTest, model_save_file, results_file):
     
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
-        model = joblib.load(models_folder+model_save_file)
+        model = joblib.load(model_save_file)
     else:
         print("You have to train source separation's model first!")
         print("Exiting ...")
@@ -323,7 +323,7 @@ def hyperparameter_tuning(statsFileTrain, statsFileValidate, statsFileTest, algo
     hyperparameter_tuning.search_parameters()
 
 def test(statsFileTest, model_save_file):
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
         model = joblib.load(models_folder+model_save_file)
     else:
@@ -342,9 +342,9 @@ def test(statsFileTest, model_save_file):
 
 def test_full_pipeline(dataset_name, statsFileTest, model_save_file, optimal_thr=True):
 
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
-        model = joblib.load(models_folder+model_save_file)
+        model = joblib.load(model_save_file)
     else:
         print("You have to train source separation's model first!")
         print("Exiting ...")
