@@ -15,4 +15,5 @@ tar -xf extracted_features.tar
 
 
 echo "Obtaining subsetsumopencl2d.so ..."
-# TODO: 
+cd sumo/sumo_pipeline/session_correlation
+make torpedosubsetsumopencl2d.so

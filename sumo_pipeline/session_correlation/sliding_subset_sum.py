@@ -429,7 +429,7 @@ class SlidingSubsetSum:
     pre_processed_partial_coverage_percentage_states_by_coverage: Dict[float, PreProcessedPartialCoveragePercentageState]
 
     # TODO: make alternate __init__ function that starts hyperparameters with hyperparameter tuning
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __init__(self, 
                  dataset_name,
                  epoch_size, 
@@ -580,7 +580,7 @@ class SlidingSubsetSum:
                     # # onion flows: {len(self.state.onion_flows)}\n
                     
     
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __pre_process(self, dataset_name, is_full_pipeline: bool) -> None:
         if is_full_pipeline == False:
             self.pre_processed_no_full_pipeline_state.toggle_state()
@@ -666,7 +666,7 @@ class SlidingSubsetSum:
                 # predicted as not correlated
                 self.state.predictions[threshold][(client_session_id, onion_session_id)] = Prediction(final_score=final_score, label=0)
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __predict(self, dataset_name: str) -> None:
         if len(self.state.database) == 0:
             self.__run_windowed_subset_sum_on_all_pairs()
@@ -728,7 +728,7 @@ class SlidingSubsetSum:
             performance_metrics.calculate_performance_scores()
         self.state.metrics_map_final_scores[threshold].calculate_performance_scores()
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __evaluate_confusion_matrix(self, dataset_name) -> None:
         if len(self.state.metrics_map) == 0:
             for i, (threshold, pair_preds) in tqdm(enumerate(self.state.predictions.items()), desc="Evaluating confusion matrix per threshold ..."):
@@ -739,7 +739,7 @@ class SlidingSubsetSum:
         else:
             logging.info("Already had data on evaluate_confusion_matrix()")
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __evaluate_by_duration(self, dataset_name, is_full_pipeline=False) -> None:
         if len(self.state.results_by_min_duration) == 0:
             for threshold in self.thresholds:
@@ -795,7 +795,7 @@ class SlidingSubsetSum:
         else:
             logging.info("Already had data on evaluate_by_duration()")
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __evaluate_by_client(self, dataset_name) -> None:
         if len(self.state.metrics_map_per_client) == 0:
             for threshold in self.thresholds:
@@ -823,7 +823,7 @@ class SlidingSubsetSum:
         else:
             logging.info("Already had data on evaluate_by_client()")
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __evaluate_by_os(self, dataset_name) -> None:
         if len(self.state.metrics_map_per_onion) == 0:
             for threshold in self.thresholds:
@@ -878,11 +878,11 @@ class SlidingSubsetSum:
         self.pre_processed_full_pipeline_state.toggle_state()
         self.state.plot()
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __pre_process_state(self, dataset_name: str) -> None:
         self.state.pre_process()
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def evaluate_coverage_by_eu_country(self, dataset_name: str):
         for zone, percentage in self.coverage_percentages.items():
             self.pre_processed_partial_coverage_percentage_states_by_coverage[percentage].toggle_state()
@@ -900,11 +900,11 @@ class SlidingSubsetSum:
         self.pre_processed_partial_coverage_percentage_states_by_coverage[1].plot()
         results_plot_maker_partial_coverage.precision_recall_curve_with_threshold_by_eu_country(self.metrics_map_final_scores, self.coverage_percentage.values(), dataset_name)
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __filter_by_zone_state(self, dataset_name: str) -> None:
         self.state.filter_by_zone(self.pre_processed_partial_coverage_states_by_continent['baseline'].possible_request_combinations)
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def evaluate_coverage_by_continent(self, dataset_name: str):
         self.pre_processed_partial_coverage_states_by_continent['baseline'].toggle_state()
         if len(self.state.possible_request_combinations) == 0:
