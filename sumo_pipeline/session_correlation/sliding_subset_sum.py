@@ -856,6 +856,7 @@ class SlidingSubsetSum:
         else:
             logging.info("Already had data on evaluate_by_os()")
 
+    @dump_instance_decorator(arg_index=1)
     def correlate_sessions(self, dataset_name, is_full_pipeline=False) -> None:
         self.__pre_process(dataset_name, is_full_pipeline)
         self.__predict(dataset_name)
