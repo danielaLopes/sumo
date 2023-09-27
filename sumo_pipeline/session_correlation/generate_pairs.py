@@ -12,6 +12,7 @@ import random
 from typing import List, Dict, Tuple, Literal
 
 import flows
+from constants import *
 
 
 # TODO: Adjust as needed
@@ -184,8 +185,7 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
         missed_client_flows_per_duration_full_pipeline[min_dur] = 0
         missed_os_flows_per_duration_full_pipeline[min_dur] = 0
 
-    dataset_name = dataset_name.split('_full_pipeline')[0]
-    top_path = f"/mnt/nas-shared/torpedo/extracted_features/extracted_features_{dataset_name}"
+    top_path = get_captures_folder(dataset_name)
     #os_flows_full_pipeline = pickle.load(open('../source_separation/full_pipeline_features/os_features_source_separation_thr_0.002577161882072687_{}.pickle'.format(dataset_name), 'rb'))
     os_flows_full_pipeline = pickle.load(open('../source_separation/full_pipeline_features/os_features_source_separation_thr_0.0010103702079504728_{}.pickle'.format(dataset_name), 'rb'))
     #os_flows_full_pipeline = pickle.load(open('../source_separation/full_pipeline_features/os_features_source_separation_thr_0.0016687361057847738_{}.pickle'.format(dataset_name), 'rb'))
@@ -226,19 +226,17 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
             session_id = client_session_id.split("_hs.pcap")[0]
 
         if session_id in client_flows:
-            if session_id in 'client-small-ostest-1-client1_os4-os-small-ostest-3_i4bukbaeqkl2mjhkgg4rrxbjuvevdz447vbmzqrvqsmi6zmi2jax5ayd_session_1527':
-                print("---> Continued in client")
             continue
         
         # Onion-side flow was mistaken as a client-side flow in the filtering phase
         if '_hs.pcap' in client_session_id:
-            if 'client-small-ostest-1-client1_os4-os-small-ostest-3_i4bukbaeqkl2mjhkgg4rrxbjuvevdz447vbmzqrvqsmi6zmi2jax5ayd_session_1527' in client_session_id:
-                print("---> _hs.pcap")
             client_session_id_split = client_session_id.split("_")
             client_folder = client_session_id_split[1].split("-ostest-")[0]
             client_extracted_features_folder = get_extracted_features_folder(top_path, "onion", client_folder, client_session_id)
             client_file_path = f"{client_extracted_features_folder}folderDict.pickle"
-            client_folder_dict = pickle.load(open(client_file_path, 'rb'))
+            # TODO
+            # client_folder_dict = pickle.load(open(client_file_path, 'rb'))
+            client_folder_dict = pickle.load(open(onion_file_path, 'rb'))
             packet_count_in = get_bucketized_packet_count(client_folder_dict['hsFlow']['timesOutAbs'], client_folder_dict['hsMetaStats']['initialTimestamp'], client_folder_dict['hsMetaStats']['lastTimestamp'], time_sampling_interval)
             client_flows[session_id] = flows.ClientFlow(client_folder_dict['hsMetaStats']['initialTimestamp'], client_folder_dict['hsMetaStats']['lastTimestamp'], packet_count_in, client_folder_dict['hsFlow']['timesOutAbs'])
 
@@ -261,14 +259,10 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
             session_id = onion_session_id.split("_hs.pcap")[0]
 
         if session_id in onion_flows:
-            if session_id in 'client-small-ostest-4-client4_os1-os-small-ostest-1_wy5euy7j7zayx6xpgzczqdvidl7dtmrm5bwqzhnhapmwfxhbk4kbklqd_session_1301':
-                print("---> Continued in onion")
             continue
         
         # Client-side flow was mistaken as an onion-side flow in the filtering phase
         if '_client.pcap' in onion_session_id:
-            if 'client-small-ostest-4-client4_os1-os-small-ostest-1_wy5euy7j7zayx6xpgzczqdvidl7dtmrm5bwqzhnhapmwfxhbk4kbklqd_session_1301' in client_session_id:
-                print("---> _client.pcap")
             onion_session_id_split = onion_session_id.split("_")
             client_folder = onion_session_id_split[0]
             onion_extracted_features_folder = get_extracted_features_folder(top_path, "client", client_folder, onion_session_id)
@@ -334,9 +328,6 @@ def inner_process_uncorrelated_pair(client_flow: flows.ClientFlow,
     os_initial_epoch = onion_flow.first_ts // epoch_size
     os_last_epoch = (onion_flow.last_ts // epoch_size) + 1
 
-    if client_session_id in 'client-small-ostest-1-client1_os4-os-small-ostest-3_i4bukbaeqkl2mjhkgg4rrxbjuvevdz447vbmzqrvqsmi6zmi2jax5ayd_session_1527' and onion_session_id in 'client-small-ostest-4-client4_os1-os-small-ostest-1_wy5euy7j7zayx6xpgzczqdvidl7dtmrm5bwqzhnhapmwfxhbk4kbklqd_session_1301':
-        print(f"---> Initial epoch: {initial_epoch}; last_epoch: {last_epoch}; os_initial_epoch: {os_initial_epoch}; os_last_epoch: {os_last_epoch}")
-
     possible_request_combinations_tmp: Dict[Tuple[str, str], flows.FlowPair] = {} # {(client_session_id, onion_session_id): FlowPair, ...}
     
     #(StartDate1 <= EndDate2) and (StartDate2 <= EndDate1)
@@ -349,8 +340,6 @@ def inner_process_uncorrelated_pair(client_flow: flows.ClientFlow,
         else:
             # remove duplicated captures from same OS
             onion_name = onion_session_id.split("_")[1]
-            if client_session_id in 'client-small-ostest-1-client1_os4-os-small-ostest-3_i4bukbaeqkl2mjhkgg4rrxbjuvevdz447vbmzqrvqsmi6zmi2jax5ayd_session_1527' and onion_session_id in 'client-small-ostest-4-client4_os1-os-small-ostest-1_wy5euy7j7zayx6xpgzczqdvidl7dtmrm5bwqzhnhapmwfxhbk4kbklqd_session_1301':
-                print(f"---> onion_name: {onion_name}", )
             if onion_name in client_session_id:
                 return None
         
@@ -410,7 +399,7 @@ def process_features_epochs_sessions(dataset_name: str,
     client_flows: Dict[str, flows.ClientFlow] = {} # {client_session_id: ClientFlow, ...}
     onion_flows: Dict[str, flows.OnionFlow] = {} # {onion_session_id: OnionFlow, ...}
 
-    top_path = f"/mnt/nas-shared/torpedo/extracted_features/extracted_features_{dataset_name}"
+    top_path = get_captures_folder(dataset_name)
     client_file_paths = list(glob.iglob(os.path.join(top_path+'/client', '**/folderDict.pickle'), recursive=True))
 
     results = []
@@ -445,6 +434,7 @@ def process_features_epochs_sessions(dataset_name: str,
                                                                        buckets_overlap,
                                                                        epoch_size, 
                                                                        epoch_tolerance))
+    # TODO: Parallelize this
     #with tqdm(total=len(clientsKeys), desc="Getting non correlated pairs features ...") as pbar:
         #results = Parallel(n_jobs=NUM_CORES, timeout=1000)(delayed(process_uncorrelated_pair)(client_flows[client_session_id[0]], onion_flows, time_sampling_interval, epoch_size, epoch_tolerance) for client_session_id in tzip(clientsKeys, leave=False))
         #results = Parallel(n_jobs=NUM_CORES)(delayed(process_uncorrelated_pair)(client_flows[client_session_id[0]], onion_flows, time_sampling_interval, epoch_size, epoch_tolerance) for client_session_id in tzip(clientsKeys, leave=False))
