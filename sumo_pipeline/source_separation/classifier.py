@@ -382,6 +382,7 @@ def dump_pipeline_features(dataset_name, features, predictions, captures, decisi
             outputClientFeatures[captures.iloc[i]] = features.iloc[i]
         else:
             outputOSFeatures[captures.iloc[i]] = features.iloc[i]
+    print(f"Dumping features for threshold {decision_threshold}")
 
     features_folder = 'full_pipeline_features/'
     if not os.path.exists(features_folder):
