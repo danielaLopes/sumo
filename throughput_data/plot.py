@@ -11,7 +11,7 @@ stddev_times = []
 stddev_throughput = []
 sol = ["subsetsum2d", "deepcoffea"]
 folder = "."
-nb_samples = 2
+nb_samples = 5
 
 if len(sys.argv) > 1:
     sol = [sys.argv[1]]
