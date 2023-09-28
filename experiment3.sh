@@ -1,6 +1,7 @@
 echo "Testing source separation model ..."
 cd sumo_pipeline/source_separation
-python3 app.py test-full-pipeline OSTest ../../extracted_features/extracted_features_OSTest/stats_source_separation.csv ../../models/source_separation/source_separation_model_bayesian_optimization.joblib
+LOCATION_EXTRACTED_FEATURES=../../extracted_features
+python3 app.py test-full-pipeline OSTest $LOCATION_EXTRACTED_FEATURES/extracted_features_OSTest/stats_source_separation.csv ../../models/source_separation/source_separation_model_bayesian_optimization.joblib
 
 echo "Testing target separation model ..."
 cd ../target_separation

@@ -11,6 +11,8 @@
 *.dat 
 *.pickle
 *.tar.gz
+*.tar 
+
 
 # Some system files
 *__pycache__/

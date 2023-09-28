@@ -18,7 +18,15 @@ import pathlib
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import os
+import argparse
 
+parser = argparse.ArgumentParser(description="A program to test DeepCorr and DeepCoFFEA with SUMo.")
+parser.add_argument("--deepcorr", help="Indicates if wants to test with DeepCorr. Requires having DeepCorr's data.", action="store_true")
+parser.add_argument("--deepcoffea", help="Indicates if wants to test with DeepCoFFEA. Requires having DeepCoFFEA's data.", action="store_true")
+args = parser.parse_args()
+deepcorr = args.deepcorr
+deepcoffea = args.deepcoffea
 
 # 
 # ## Compute stats
@@ -26,42 +34,45 @@ from tqdm import tqdm
 
 # In[ ]:
 
-
 from compute_stats import compute_deepcorr_stats, compute_deepcoffea_stats, print_quartiles
 data = {}
+# get deepcorr
+if deepcorr:
+    stats = compute_deepcorr_stats("datasets/deepcorr_tar_bz2")
+    data['deepcorr'] = {
+        "clientdownnpkts": stats[0], "clientupnpkts": stats[1], "serverdownnpkts": stats[2], "serverupnpkts": stats[3], "clientdurs": stats[4], "serverdurs": stats[5], "clientdownbytes": stats[6], "clientupbytes": stats[7], "serverdownbytes": stats[8], "serverupbytes": stats[9], "n_flows": stats[10]
+    }
+    print_quartiles(stats, "datasets/deepcorr_tar_bz2")
 
 
 # In[ ]:
 
 
 # get deepcoffea
-stats = compute_deepcoffea_stats("datasets/CrawlE_Proc")
-data['deepcoffea'] = {
-    "clientdownnpkts": stats[0], "clientupnpkts": stats[1], "serverdownnpkts": stats[2], "serverupnpkts": stats[3], "clientdurs": stats[4], "serverdurs": stats[5], "clientdownbytes": stats[6], "clientupbytes": stats[7], "serverdownbytes": stats[8], "serverupbytes": stats[9], "n_flows": stats[10]
-}
-print_quartiles(stats, "datasets/CrawlE_Proc")
+if deepcoffea:
+    stats = compute_deepcoffea_stats("datasets/CrawlE_Proc")
+    data['deepcoffea'] = {
+        "clientdownnpkts": stats[0], "clientupnpkts": stats[1], "serverdownnpkts": stats[2], "serverupnpkts": stats[3], "clientdurs": stats[4], "serverdurs": stats[5], "clientdownbytes": stats[6], "clientupbytes": stats[7], "serverdownbytes": stats[8], "serverupbytes": stats[9], "n_flows": stats[10]
+    }
+    print_quartiles(stats, "datasets/CrawlE_Proc")
 
 
 # In[ ]:
 
+if deepcoffea:
+    # get datasets_20230521_train
+    stats = compute_deepcoffea_stats("datasets/datasets_20230521_train_deepcoffea")
+    data['20230521_train_dcf'] = {
+        "clientdownnpkts": stats[0], "clientupnpkts": stats[1], "serverdownnpkts": stats[2], "serverupnpkts": stats[3], "clientdurs": stats[4], "serverdurs": stats[5], "clientdownbytes": stats[6], "clientupbytes": stats[7], "serverdownbytes": stats[8], "serverupbytes": stats[9], "n_flows": stats[10]
+    }
+    print_quartiles(stats, "datasets/datasets_20230521_train_deepcoffea")
 
-# get datasets_20230521_train
-#stats = compute_deepcoffea_stats("datasets/datasets_20230521_train_deepcoffea")
-stats = compute_deepcoffea_stats("/mnt/nas-shared/torpedo/datasets_20230521/OSTrain/experiment_results_for_deepcoffea_req")
-data['20230521_train_dcf'] = {
-    "clientdownnpkts": stats[0], "clientupnpkts": stats[1], "serverdownnpkts": stats[2], "serverupnpkts": stats[3], "clientdurs": stats[4], "serverdurs": stats[5], "clientdownbytes": stats[6], "clientupbytes": stats[7], "serverdownbytes": stats[8], "serverupbytes": stats[9], "n_flows": stats[10]
-}
-#print_quartiles(stats, "datasets/datasets_20230521_train_deepcoffea")
-print_quartiles(stats, "/mnt/nas-shared/torpedo/datasets_20230521/OSTrain/experiment_results_for_deepcoffea_req")
-
-# get datasets_20230521_test
-stats = compute_deepcoffea_stats("/mnt/nas-shared/torpedo/datasets_20230521/OSTest/experiment_results_for_deepcoffea_req")
-#stats = compute_deepcoffea_stats("datasets/datasets_20230521_test_deepcoffea")
-data['20230521_test_dcf'] = {
-    "clientdownnpkts": stats[0], "clientupnpkts": stats[1], "serverdownnpkts": stats[2], "serverupnpkts": stats[3], "clientdurs": stats[4], "serverdurs": stats[5], "clientdownbytes": stats[6], "clientupbytes": stats[7], "serverdownbytes": stats[8], "serverupbytes": stats[9], "n_flows": stats[10]
-}
-#print_quartiles(stats, "datasets/datasets_20230521_test_deepcoffea")
-print_quartiles(stats, "/mnt/nas-shared/torpedo/datasets_20230521/OSTest/experiment_results_for_deepcoffea_req")
+    # get datasets_20230521_test
+    stats = compute_deepcoffea_stats("datasets/datasets_20230521_test_deepcoffea")
+    data['20230521_test_dcf'] = {
+        "clientdownnpkts": stats[0], "clientupnpkts": stats[1], "serverdownnpkts": stats[2], "serverupnpkts": stats[3], "clientdurs": stats[4], "serverdurs": stats[5], "clientdownbytes": stats[6], "clientupbytes": stats[7], "serverdownbytes": stats[8], "serverupbytes": stats[9], "n_flows": stats[10]
+    }
+    print_quartiles(stats, "datasets/datasets_20230521_test_deepcoffea")
 
 
 # In[ ]:
@@ -121,6 +132,9 @@ axs[1].set_ylim(top=9000)
 axs[1].grid(axis='y')
 
 fig.tight_layout()
+results_dir = "datasets/stats"
+if not os.path.isdir(results_dir):
+    os.mkdir(results_dir)
 fig.savefig(f"datasets/stats/all_npkts_wdc.pdf")
 fig.savefig(f"datasets/stats/all_npkts_wdc.png")
 
@@ -205,93 +219,93 @@ fig.savefig(f"datasets/stats/all_durs_npktps_wdc.png")
 
 # In[ ]:
 
+if deepcorr:
+    corr_matrix_path = "experiments/deepcorr_deepcorr_tar_bz2_us199_fs300_nt1000_ruTrue_lr1e-04_mep60_bs128/ep-003_racc0.835_metrics.npz"
+    corr_matrix_path = pathlib.Path(corr_matrix_path)
 
-corr_matrix_path = "experiments/deepcorr_deepcorr_tar_bz2_us199_fs300_nt1000_ruTrue_lr1e-04_mep60_bs128/ep-003_racc0.835_metrics.npz"
-corr_matrix_path = pathlib.Path(corr_matrix_path)
+    loaded = np.load(corr_matrix_path)
+    corr_matrix = loaded["corr_matrix"]
+    assert corr_matrix.shape[0] == corr_matrix.shape[1], "not a square matrix"
 
-loaded = np.load(corr_matrix_path)
-corr_matrix = loaded["corr_matrix"]
-assert corr_matrix.shape[0] == corr_matrix.shape[1], "not a square matrix"
-
-labels = np.eye(corr_matrix.shape[0])
-
-
-# In[ ]:
+    labels = np.eye(corr_matrix.shape[0])
 
 
-etas = [i/100 for i in range(0, 100, 2)]
-tprs = []
-fprs = []
-for eta in etas:
-    eta_yhats = (corr_matrix >= eta).astype(np.int64)
-
-    tp, fp, tn, fn = 0, 0, 0, 0
-    for i in range(corr_matrix.shape[0]):
-        for j in range(corr_matrix.shape[1]):
-            if eta_yhats[i,j] == 1 and labels[i,j] == 1:
-                tp += 1
-            elif eta_yhats[i,j] == 1 and labels[i,j] == 0:
-                fp += 1
-            elif eta_yhats[i,j] == 0 and labels[i,j] == 1:
-                fn += 1
-            else:
-                tn += 1
-
-    tprs.append(tp / (tp + fn))
-    fprs.append(fp / (fp + tn))
+    # In[ ]:
 
 
-# In[ ]:
+    etas = [i/100 for i in range(0, 100, 2)]
+    tprs = []
+    fprs = []
+    for eta in etas:
+        eta_yhats = (corr_matrix >= eta).astype(np.int64)
 
+        tp, fp, tn, fn = 0, 0, 0, 0
+        for i in range(corr_matrix.shape[0]):
+            for j in range(corr_matrix.shape[1]):
+                if eta_yhats[i,j] == 1 and labels[i,j] == 1:
+                    tp += 1
+                elif eta_yhats[i,j] == 1 and labels[i,j] == 0:
+                    fp += 1
+                elif eta_yhats[i,j] == 0 and labels[i,j] == 1:
+                    fn += 1
+                else:
+                    tn += 1
 
-plt.style.use('seaborn-v0_8-paper')
-params = {
-    'axes.titlesize': 20,
-    'axes.labelsize': 14,
-    'xtick.labelsize': 12,
-    'ytick.labelsize': 12,
-    'text.usetex': False,
-}
-plt.rcParams.update(params)
+        tprs.append(tp / (tp + fn))
+        fprs.append(fp / (fp + tn))
 
 
 # In[ ]:
 
 
-plt.clf()
-fig, ax = plt.subplots(1, 1)
-ax.plot(etas, tprs, linestyle="solid", marker="o", markersize=6)
-ax.set_xlabel("Threshold (eta).")
-ax.set_ylabel("True Positive Rate")
-ax.set_title("TPR with different etas.")
-ax.grid()
-fig.tight_layout()
+    plt.style.use('seaborn-v0_8-paper')
+    params = {
+        'axes.titlesize': 20,
+        'axes.labelsize': 14,
+        'xtick.labelsize': 12,
+        'ytick.labelsize': 12,
+        'text.usetex': False,
+    }
+    plt.rcParams.update(params)
+
+
+    # In[ ]:
+
+
+    plt.clf()
+    fig, ax = plt.subplots(1, 1)
+    ax.plot(etas, tprs, linestyle="solid", marker="o", markersize=6)
+    ax.set_xlabel("Threshold (eta).")
+    ax.set_ylabel("True Positive Rate")
+    ax.set_title("TPR with different etas.")
+    ax.grid()
+    fig.tight_layout()
+
+
+    # In[ ]:
+
+
+    plt.clf()
+    fig, ax = plt.subplots(1, 1)
+    ax.plot(etas, fprs, linestyle="solid", marker="o")
+    ax.set_xlabel("Threshold (eta).")
+    ax.set_ylabel("False Positive Rate")
+    ax.set_title("FPR with different etas.")
+    ax.grid()
+    fig.tight_layout()
 
 
 # In[ ]:
 
 
-plt.clf()
-fig, ax = plt.subplots(1, 1)
-ax.plot(etas, fprs, linestyle="solid", marker="o")
-ax.set_xlabel("Threshold (eta).")
-ax.set_ylabel("False Positive Rate")
-ax.set_title("FPR with different etas.")
-ax.grid()
-fig.tight_layout()
-
-
-# In[ ]:
-
-
-plt.clf()
-fig, ax = plt.subplots(1, 1)
-ax.plot(fprs, tprs, linestyle="solid", marker="o")
-ax.set_xlabel("False positive rate")
-ax.set_ylabel("True positive rate")
-ax.set_title("ROC Curve.")
-ax.grid()
-fig.tight_layout()
+    plt.clf()
+    fig, ax = plt.subplots(1, 1)
+    ax.plot(fprs, tprs, linestyle="solid", marker="o")
+    ax.set_xlabel("False positive rate")
+    ax.set_ylabel("True positive rate")
+    ax.set_title("ROC Curve.")
+    ax.grid()
+    fig.tight_layout()
 
 
 # ## DeepCoffea evaluation
@@ -353,33 +367,6 @@ def get_tprsfprsprs_localthr(corr_matrix, n_wins, vote_thr):
             prs.append(tp / (tp + fp))
 
     return tprs, fprs, prs
-best_npz_path = pathlib.Path("experiments/deepcoffea_data230521_d3.0_ws5.0_nw5_thr20_tl300_el500_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-975_loss0.00199_metrics.npz")
-lsetup = "_".join(best_npz_path.parent.name.split("_")[-12:-9])
-
-result_fpath = pathlib.Path("./datasets/stats/lthr.p")
-if result_fpath.exists():
-    with open(result_fpath, "rb") as fp:
-        ltprs, lfprs, lprs = pickle.load(fp)
-else:
-    loaded = np.load(best_npz_path)
-    ltprs, lfprs, lprs = get_tprsfprsprs_localthr(loaded['corr_matrix'], 5, 3)
-    with open(result_fpath, "wb") as fp:
-        pickle.dump((ltprs, lfprs, lprs), fp)
-
-
-# In[ ]:
-
-
-ltprs, lfprs, lprs = {}, {}, {}
-with open("./datasets/stats/lthr.p", "rb") as fp:
-    ltprs['d3.0_ws5.0_nw5'], lfprs['d3.0_ws5.0_nw5'], lprs['d3.0_ws5.0_nw5'] = pickle.load(fp)
-
-with open("./datasets/stats/lthr_d2.p", "rb") as fp:
-    ltprs['d2.0_ws3.0_nw7'], lfprs['d2.0_ws3.0_nw7'], lprs['d2.0_ws3.0_nw7'] = pickle.load(fp)
-
-
-# In[ ]:
-
 
 def get_tprsfprsprs_globalthr(corr_matrix, n_wins, vote_thr):
     n_test = corr_matrix.shape[0] // n_wins
@@ -425,121 +412,159 @@ def get_tprsfprsprs_globalthr(corr_matrix, n_wins, vote_thr):
 
     return tprs, fprs, prs
 
-npz_paths = [
-    "experiments/deepcoffea_data230521_d2.0_ws3.0_nw7_thr15_tl200_el300_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-1441_loss0.00292_metrics.npz",
-    "experiments/deepcoffea_data230521_d3.0_ws5.0_nw5_thr20_tl300_el500_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-975_loss0.00199_metrics.npz"
-]
 
-result_fpath = pathlib.Path("./datasets/stats/gthr.p")
-if result_fpath.exists():
-    with open(result_fpath, "rb") as fp:
-        gtprs, gfprs, gprs = pickle.load(fp)
-else:
-    gtprs, gfprs, gprs = {}, {}, {}
-    for npz_path in npz_paths:
-        npz_path = pathlib.Path(npz_path)
-        fields = npz_path.parent.name.split("_")
-        n_wins = int(fields[-10].split("nw")[1])
-        setup = "_".join(fields[-12:-9])
+if deepcoffea:
+    best_npz_path = pathlib.Path("experiments/deepcoffea_data230521_d3.0_ws5.0_nw5_thr20_tl300_el500_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-975_loss0.00199_metrics.npz")
+    lsetup = "_".join(best_npz_path.parent.name.split("_")[-12:-9])
+
+    result_fpath = pathlib.Path("./datasets/stats/lthr.p")
+    if result_fpath.exists():
+        with open(result_fpath, "rb") as fp:
+            ltprs, lfprs, lprs = pickle.load(fp)
+    else:
+        loaded = np.load(best_npz_path)
+        ltprs, lfprs, lprs = get_tprsfprsprs_localthr(loaded['corr_matrix'], 5, 3)
+        with open(result_fpath, "wb") as fp:
+            pickle.dump((ltprs, lfprs, lprs), fp)
+
+
+# In[ ]:
+
+
+    ltprs, lfprs, lprs = {}, {}, {}
+    with open("./datasets/stats/lthr.p", "rb") as fp:
+        ltprs['d3.0_ws5.0_nw5'], lfprs['d3.0_ws5.0_nw5'], lprs['d3.0_ws5.0_nw5'] = pickle.load(fp)
+
+    with open("./datasets/stats/lthr_d2.p", "rb") as fp:
+        ltprs['d2.0_ws3.0_nw7'], lfprs['d2.0_ws3.0_nw7'], lprs['d2.0_ws3.0_nw7'] = pickle.load(fp)
+
+
+# In[ ]:
+
+
+    npz_paths = [
+        "experiments/deepcoffea_data230521_d2.0_ws3.0_nw7_thr15_tl200_el300_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-1441_loss0.00292_metrics.npz",
+        "experiments/deepcoffea_data230521_d3.0_ws5.0_nw5_thr20_tl300_el500_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-975_loss0.00199_metrics.npz"
+    ]
+
+    result_fpath = pathlib.Path("./datasets/stats/gthr.p")
+    if result_fpath.exists():
+        with open(result_fpath, "rb") as fp:
+            gtprs, gfprs, gprs = pickle.load(fp)
+    else:
+        gtprs, gfprs, gprs = {}, {}, {}
+        for npz_path in npz_paths:
+            npz_path = pathlib.Path(npz_path)
+            fields = npz_path.parent.name.split("_")
+            n_wins = int(fields[-10].split("nw")[1])
+            setup = "_".join(fields[-12:-9])
+            
+            loaded = np.load(npz_path)
+            corr_matrix = loaded['corr_matrix']
+            loss_mean = loaded['loss_mean']
+
+            if n_wins == 5:
+                vote_thr = 3
+            elif n_wins == 7:
+                vote_thr = 4
+            elif n_wins == 9:
+                vote_thr = 5
+            elif n_wins == 11:
+                vote_thr = 9    # the number dcf authors used
+
+            tprs, fprs, prs = get_tprsfprsprs_globalthr(corr_matrix, n_wins, vote_thr)
+            gtprs[setup] = tprs
+            gfprs[setup] = fprs
+            gprs[setup] = prs
+
+        with open(result_fpath, "wb") as fp:
+            pickle.dump((gtprs, gfprs, gprs), fp)
+
+
+# In[ ]:
+
+
+    plt.style.use('seaborn-v0_8-paper')
+    params = {
+        'axes.titlesize': 18,
+        'axes.labelsize': 20,
+        'font.size': 10,
+        'xtick.labelsize': 16,
+        'ytick.labelsize': 16,
+        'text.usetex': False,
+        'axes.spines.top': False,
+        'axes.spines.right': False
+    }
+    plt.rcParams.update(params)
+
+
+    # In[ ]:
+
+
+    plt.clf()
+    fig, ax = plt.subplots(1, 1, figsize=(6.4, 4.8))
+
+    setups = []
+    for key in gtprs.keys():
+        setups.append("_".join(key.split("_")))
+    setups = sorted(set(setups))
+
+    for key, gtprs_data in gtprs.items():
+        gfprs_data = gfprs[key]
+        ltprs_data = ltprs[key]
+        lfprs_data = lfprs[key]
         
-        loaded = np.load(npz_path)
-        corr_matrix = loaded['corr_matrix']
-        loss_mean = loaded['loss_mean']
+        setupi = setups.index(key)
+        if setupi == 0:
+            linestyle = "solid"
+            label = "setup-1"
+        elif setupi == 1:
+            linestyle = "dashed"
+            label = "setup-2"
+        else:
+            raise ValueError(f"setupi: {setupi} not supported now.")
+        
+        ax.plot(gfprs_data, gtprs_data, linewidth=1.5, linestyle=linestyle, label=f"{label}_g")
+        ax.plot(lfprs_data, ltprs_data, linewidth=1.5, linestyle=linestyle, label=f"{label}_l")
 
-        if n_wins == 5:
-            vote_thr = 3
-        elif n_wins == 7:
-            vote_thr = 4
-        elif n_wins == 9:
-            vote_thr = 5
-        elif n_wins == 11:
-            vote_thr = 9    # the number dcf authors used
+    ax.set_xlabel("False positive rate")
+    ax.set_ylabel("True positive rate")
+    ax.legend(loc="lower right", fontsize=20)
+    fig.tight_layout()
+    fig.savefig(f"datasets/stats/dcf_eval_roc.pdf")
+    fig.savefig(f"datasets/stats/dcf_eval_roc.png")
 
-        tprs, fprs, prs = get_tprsfprsprs_globalthr(corr_matrix, n_wins, vote_thr)
-        gtprs[setup] = tprs
-        gfprs[setup] = fprs
-        gprs[setup] = prs
-
-    with open(result_fpath, "wb") as fp:
-        pickle.dump((gtprs, gfprs, gprs), fp)
-
-
-# In[ ]:
-
-
-plt.style.use('seaborn-v0_8-paper')
-params = {
-    'axes.titlesize': 18,
-    'axes.labelsize': 20,
-    'font.size': 10,
-    'xtick.labelsize': 16,
-    'ytick.labelsize': 16,
-    'text.usetex': False,
-    'axes.spines.top': False,
-    'axes.spines.right': False
-}
-plt.rcParams.update(params)
-
-
-# In[ ]:
+    plt.clf()
+    fig, ax = plt.subplots(1, 1, figsize=(6.4, 4.8))
+    for key, gtprs_data in gtprs.items():
+        gprs_data = gprs[key]
+        ltprs_data = ltprs[key]
+        lprs_data = lprs[key]
+        
+        setupi = setups.index(key)
+        if setupi == 0:
+            linestyle = "solid"
+            label = "setup-1"
+        elif setupi == 1:
+            linestyle = "dashed"
+            label = "setup-2"
+        else:
+            raise ValueError(f"setupi: {setupi} not supported now.")
+        
+        ax.plot(gtprs_data, gprs_data, linewidth=1.5, linestyle=linestyle, label=f"{label}_g")
+        ax.plot(ltprs_data, lprs_data, linewidth=1.5, linestyle=linestyle, label=f"{label}_l")
+    ax.set_xlabel("Recall")
+    ax.set_ylabel("Precision")
+    ax.legend(loc="upper right", fontsize=20)
+    fig.tight_layout()
+    fig.savefig(f"datasets/stats/dcf_eval_pr.pdf")
+    fig.savefig(f"datasets/stats/dcf_eval_pr.png")
 
 
-plt.clf()
-fig, ax = plt.subplots(1, 1, figsize=(6.4, 4.8))
 
-setups = []
-for key in gtprs.keys():
-    setups.append("_".join(key.split("_")))
-setups = sorted(set(setups))
 
-for key, gtprs_data in gtprs.items():
-    gfprs_data = gfprs[key]
-    ltprs_data = ltprs[key]
-    lfprs_data = lfprs[key]
-    
-    setupi = setups.index(key)
-    if setupi == 0:
-        linestyle = "solid"
-        label = "setup-1"
-    elif setupi == 1:
-        linestyle = "dashed"
-        label = "setup-2"
-    else:
-        raise ValueError(f"setupi: {setupi} not supported now.")
-    
-    ax.plot(gfprs_data, gtprs_data, linewidth=1.5, linestyle=linestyle, label=f"{label}_g")
-    ax.plot(lfprs_data, ltprs_data, linewidth=1.5, linestyle=linestyle, label=f"{label}_l")
 
-ax.set_xlabel("False positive rate")
-ax.set_ylabel("True positive rate")
-ax.legend(loc="lower right", fontsize=20)
-fig.tight_layout()
-fig.savefig(f"datasets/stats/dcf_eval_roc.pdf")
-fig.savefig(f"datasets/stats/dcf_eval_roc.png")
 
-plt.clf()
-fig, ax = plt.subplots(1, 1, figsize=(6.4, 4.8))
-for key, gtprs_data in gtprs.items():
-    gprs_data = gprs[key]
-    ltprs_data = ltprs[key]
-    lprs_data = lprs[key]
-    
-    setupi = setups.index(key)
-    if setupi == 0:
-        linestyle = "solid"
-        label = "setup-1"
-    elif setupi == 1:
-        linestyle = "dashed"
-        label = "setup-2"
-    else:
-        raise ValueError(f"setupi: {setupi} not supported now.")
-    
-    ax.plot(gtprs_data, gprs_data, linewidth=1.5, linestyle=linestyle, label=f"{label}_g")
-    ax.plot(ltprs_data, lprs_data, linewidth=1.5, linestyle=linestyle, label=f"{label}_l")
-ax.set_xlabel("Recall")
-ax.set_ylabel("Precision")
-ax.legend(loc="upper right", fontsize=20)
-fig.tight_layout()
-fig.savefig(f"datasets/stats/dcf_eval_pr.pdf")
-fig.savefig(f"datasets/stats/dcf_eval_pr.png")
+
+
 

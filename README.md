@@ -1,42 +1,126 @@
-# SUMo
+# SUMo: Flow Correlation Attacks on Tor Onion Sessions using Sliding Subset Sum
 
 This repository presents the code for the artefact evaluation for The Network and Distributed System Security Symposium (NDSS) 2024.
 
-To run the experiements we need the extracted features from the dataset. Download them from here:
-https://zenodo.org/record/8369700/files/extracted_features.tar.gz
+### If you make use of our work please cite our NDSS'24 paper:
+
+"Flow Correlation Attacks on Tor Onion Service Sessions with Sliding Subset Sum". Daniela Lopes, Jin-Dong Dong, Daniel Castro, Pedro Medeiros, Diogo Barradas, Bernardo Portela, João Vinagre, Bernardo Ferreira, Nicolas Christin, and Nuno Santos. The Network and Distributed System Security Symposium (NDSS) 2024.
+
+## Artifact Evaluation
+
+We make available a set of scripts to run all the experiments that reproduce the main results of the paper. The whole set of experiments can be executed by running:
+```
+./experiment_all.sh
+```
+Alternatively, you can follow the following steps to individually execute each experiment:
+
+#### Setup
+Run the following script to install dependencies and compile the C code necessary for the following experiments:
+```
+./setup.sh
+```
+
+#### Experiment (E1) Session Matching with Perfect Filtering Phase
+We expect this to take a maximum of 40 minutes. 
+```
+./experiment1.sh
+./experiment1_results.sh
+```
+
+#### Experiment (E2) Session Matching with Partial Coverage
+We expect this to take a maximum of 2.5 hours. 
+```
+./experiment2.sh
+```
+
+#### Experiment (E3) Session Matching with Imperfect Filtering Phase
+We expect this to take a maximum of 1 hour. 
+```
+./experiment3_setup.sh
+./experiment3.sh
+./experiment3_results.sh
+```
+
+#### Experiment (E4) Comparison with the State-of-the-Art on Flow Correlation
+We expect this to take a maximum of xxx. 
+```
+./experiment4_setup.sh
+./experiment4.sh
+./experiment4_results.sh
+```
+
+#### Experiment (E5) Throughput Evaluation
+We expect this to take a maximum of 1 hour. 
+```
+./experiment5.sh
+```
+
+
+
+
+
+## Installation
+
+To run the experiments we need the extracted features from the dataset. Download them from here:
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8369700.svg)](https://zenodo.org/record/8369700/files/extracted_features.tar.gz)
 
 Decompress with:
 ```gzip -d extracted_features.tar.gz && tar -xf extracted_features.tar```
 
 The datasets are also available from:
- * [OSTrain.tar.gz](https://zenodo.org/record/8362616/files/OSTrain.tar.gz)
- * [OSValidate.tar.gz](https://zenodo.org/record/8360991/files/OSValidate.tar.gz)
- * [OSTest.tar.gz](https://zenodo.org/record/8359342/files/OSTest.tar.gz)
-
-## Experiments in the artefact evalution
-
-We have a selection of experiments that can be easily executed via bash scripts.
-First make sure you follow the instructions in [setup.sh](./setup.sh), which will install all the dependencies.
-
-### Experience 1
+ * OSTrain.tar.gz: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8362616.svg)](https://zenodo.org/record/8362616/files/OSTrain.tar.gz)
+ * OSValidate.tar.gz: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8360991.svg)](https://zenodo.org/record/8360991/files/OSValidate.tar.gz)
+ * OSTest.tar.gz: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8359342.svg)](https://zenodo.org/record/8359342/files/OSTest.tar.gz)
 
 
 
-### Experience 2
+## Run SUMo
+
+### Filtering phase
+The pre-trained models used to take the paper results are available in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8366378.svg)](https://zenodo.org/record/8366378/files/extracted_features.tar.gz)
+
+#### Source separation
+```
+cd sumo_pipeline/source_separation
+python app.py --help
+python app.py [COMMAND] --help
+```
+
+
+#### Target separation
+```
+cd sumo_pipeline/target_separation
+python app.py --help
+python app.py [COMMAND] --help
+```
+
+
+### Matching phase
+#### Correlation
+```
+cd sumo_pipeline/session_correlation
+python app.py --help
+python app.py [COMMAND] --help
+```
 
 
 
-### Experience 3
+### Comparison with DeepCorr / DeepCoFFEA
+The SUMo features converted to the DeepCoFFEA format are available at:
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8386335.svg)](https://zenodo.org/record/8386335/files/sumo_features_for_deepcoffea.tar.gz)
 
-### Experience 4
 
-
-
-### Experience 5
+### Throughput/latency
 
 To collect the latency/throughput metrics of SUMo follow the instructions in (experience5.sh)[./experiment5.sh]. It should output a plot in `experiment5/plot_subsetsum2d.pdf` with the latency/throughput curve of our solution. The script also prints the point with maximum throughput.
 
 
-### If you make use of our work please cite our NDSS'24 paper:
+### Guard coverage
+#### Study Tor relays in client circuit
+```
+cd guard_coverage
+```
 
-"Flow Correlation Attacks on Tor Onion Service Sessions with Sliding Subset Sum". Daniela Lopes, Jin-Dong Dong, Daniel Castro, Pedro Medeiros, Diogo Barradas, Bernardo Portela, João Vinagre, Bernardo Ferreira, Nicolas Christin, and Nuno Santos. The Network and Distributed System Security Symposium (NDSS) 2024.
+* Execute tor_client_stem.ipynb to obtain ./results/data/client_guard_nodes.joblib, client_middle_nodes.joblib, ./results/data/client_exit_nodes.joblib
+
+* Plot client-side guard coverage per ISP, per AS and per country by executing plot_guard_probabilities_client_only.ipynb
