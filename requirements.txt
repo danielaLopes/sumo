@@ -2,3 +2,9 @@ typer
 matplotlib
 xgboost
 hyperopt
+pyopencl
+dill
+dpkt
+scapy
+mycolorpy
+seaborn

@@ -112,7 +112,7 @@ The SUMo features converted to the DeepCoFFEA format are available at:
 
 ### Throughput/latency
 
-To collect the latency/throughput metrics of SUMo follow the instructions in (throughput_sumo.sh)[./experiments/throughput_sumo.sh]. It should output a plot in `sumo/experiments/plot_subsetsum2d.pdf` with the latency/throughput curve of our solution.
+To collect the latency/throughput metrics of SUMo follow the instructions in (experience5.sh)[./experiment5.sh]. It should output a plot in `experiment5/plot_subsetsum2d.pdf` with the latency/throughput curve of our solution. The script also prints the point with maximum throughput.
 
 
 ### Guard coverage
