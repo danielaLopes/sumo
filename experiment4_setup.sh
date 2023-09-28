@@ -19,6 +19,6 @@ echo "Converting SUMo's features into DeepCoFFEA's features ..."
 python3 sumo_to_deepcoffea_features.py
 
 # TODO: Sill producing errors
-echo "Generating model files for DeepCoFFEA ..."
-./scripts/run_dcf_20230521.sh 
-./scripts/run_dcf_20230521_2.sh 
+#echo "Generating model files for DeepCoFFEA ..."
+#./scripts/run_dcf_20230521.sh 
+#./scripts/run_dcf_20230521_2.sh 

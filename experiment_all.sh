@@ -1,6 +1,10 @@
-echo "\n\n### Running setup.sh (requires sudo)"
-#./setup.sh packages # this will prompt for sudo (needed for certain packages)
-./setup.sh 
+# Uncomment if running in personal machine. 
+# Requires sudo
+#echo "\n\n### Running setup.sh"
+#./setup.sh 
+
+echo "\n\n### Running experiment1_setup.sh"
+./experiment1_setup.sh
 
 echo "\n\n### Running experiment1.sh"
 ./experiment1.sh
