@@ -13,21 +13,28 @@ The datasets are also available from:
  * [OSValidate.tar.gz](https://zenodo.org/record/8360991/files/OSValidate.tar.gz)
  * [OSTest.tar.gz](https://zenodo.org/record/8359342/files/OSTest.tar.gz)
 
-## Source separation
+## Experiments in the artefact evalution
+
+We have a selection of experiments that can be easily executed via bash scripts.
+First make sure you follow the instructions in [setup.sh](./setup.sh), which will install all the dependencies.
+
+### Experience 1
 
 
 
-## Target separation
+### Experience 2
 
 
 
-## Correlation
+### Experience 3
+
+### Experience 4
 
 
 
-## Throughput/latency
+### Experience 5
 
-To collect the latency/throughput metrics of SUMo follow the instructions in (throughput_sumo.sh)[./experiments/throughput_sumo.sh]. It should output a plot in `sumo/experiments/plot_subsetsum2d.pdf` with the latency/throughput curve of our solution.
+To collect the latency/throughput metrics of SUMo follow the instructions in (experience5.sh)[./experiment5.sh]. It should output a plot in `experiment5/plot_subsetsum2d.pdf` with the latency/throughput curve of our solution. The script also prints the point with maximum throughput.
 
 
 ### If you make use of our work please cite our NDSS'24 paper:
