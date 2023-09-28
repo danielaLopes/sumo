@@ -145,22 +145,21 @@ def plot(pcaps_folder: str, dataset_name: str):
     instance.plot(pcaps_folder, dataset_name)
 
 @app.command()
-def plot_paper_results(pcaps_folder: str, dataset_name: str):
+def plot_paper_results(dataset_name: str):
     """
     Plot correlation results assuming a perfect filtering phase
     for the main plots presented in the paper.
 
     Args:
-        pcaps_folder (str): The path to the raw pcaps.
         dataset_name (str): The name that uniquely identifies this dataset 
                             so that we can store results.
 
     Example:
-        $ python3 app.py plot-paper-results /mnt/nas-shared/torpedo/datasets_20230521/OSTest/experiment_results/ OSTest
+        $ python3 app.py plot-paper-results OSTest
     """
     typer.echo("Plotting correlation results presented in paper ...")
     instance = __get_instance(dataset_name)
-    instance.plot_paper_results(pcaps_folder, dataset_name)
+    instance.plot_paper_results(dataset_name)
 
 @app.command()
 def plot_full_pipeline(dataset_name: str):

@@ -211,19 +211,19 @@ def optimal_threshold(tpr, fpr, thresholds):
 def get_tpr_fpr_threshold_preds(probabilities, y_test, threshold=THRESHOLD):
     #threshold = 0.9
     threshold_vector = np.greater_equal(probabilities, threshold).astype(int)
-    print("---- threshold {}".format(threshold))
+    #print("---- threshold {}".format(threshold))
     tpr, fpr, precision, recall = true_false_positive(threshold_vector, y_test)
-    print("tpr {}; fpr {}; precision {}; recall {}".format(tpr, fpr, precision, recall))
+    #print("tpr {}; fpr {}; precision {}; recall {}".format(tpr, fpr, precision, recall))
 
-    print("COUNT OCCURRENCES", np.count_nonzero(threshold_vector == 1))
+    #print("COUNT OCCURRENCES", np.count_nonzero(threshold_vector == 1))
     return threshold_vector
 
 
 def plot_precision_recall_curve_zoomin(stats_file_test, model_save_file, results_file):
     
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
-        model = joblib.load(models_folder+model_save_file)
+        model = joblib.load(model_save_file)
     else:
         print("You have to train target separation's model first!")
         print("Exiting ...")
@@ -343,7 +343,7 @@ def gather_dataset(statsFile):
 
 
 def gather_full_pipeline_dataset():
-    clientsFullPipeline = pickle.load(open('../source_separation/full_pipeline_features/client_features_source_separation_thr_0.0010103702079504728_small_OSTest.pickle', 'rb'))
+    clientsFullPipeline = pickle.load(open('../source_separation/full_pipeline_features/client_features_source_separation_thr_0.0010103702079504728_OSTest.pickle', 'rb'))
     captures = list(clientsFullPipeline.keys())
 
     x_train = pd.DataFrame(clientsFullPipeline.values())
@@ -397,9 +397,9 @@ def hyperparameter_tuning(plFileTrain, statsFileTrain, plFileValidate, statsFile
 
 def test(stats_file_test, model_save_file):
 
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
-        model = joblib.load(models_folder+model_save_file)
+        model = joblib.load(model_save_file)
     else:
         print("You have to train target separation's model first!")
         print("Exiting ...")
@@ -417,9 +417,9 @@ def test(stats_file_test, model_save_file):
 
 def test_full_pipeline(dataset_name, model_save_file):
 
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
-        model = joblib.load(models_folder+model_save_file)
+        model = joblib.load(model_save_file)
     else:
         print("You have to train and test target separation's model and train target separation's model first!")
         print("Exiting ...")

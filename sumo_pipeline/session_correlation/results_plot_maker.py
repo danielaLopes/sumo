@@ -343,11 +343,11 @@ def precision_recall_curve_with_threshold_multiple_session_durations(figures_res
                 high_precision_results[threshold][min_duration]['recall'] = results_by_min_duration_by_threshold.recall
     #print("\n\nXXX high_precision_results", high_precision_results)
 
+    print("flow_count_by_duration.keys()", flow_count_by_duration.keys())
+
     thresholds = list(results_by_min_duration.keys())
-    min_durations_all = np.array(list(results_by_min_duration[thresholds[0]].keys())) # minutes to seconds
-    #min_durations = np.arange(min(min_durations_all), max(min_durations_all) + 1, 4 * 60)
     min_durations = np.array(durations_to_analyze) * 60
-    #min_duration_flows = list(flow_count_by_duration.values())
+    print("min_durations", min_durations)
     min_duration_flows = []
     for min_duration in min_durations:
         min_duration_flows.append(flow_count_by_duration[min_duration])

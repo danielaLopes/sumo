@@ -217,7 +217,7 @@ class PreProcessedNoFullPipelineState(State):
             concurrent_requests = dataset_concurrency_analysis.get_session_concurrency_at_onions_from_features(dataset_name)
         return concurrent_requests
     
-    def plot_paper_results(self, captures_folder_test: str, dataset_name: str, threshold: float) -> None:
+    def plot_paper_results(self, dataset_name: str, threshold: float) -> None:
         super().plot()
 
         concurrent_requests = self.get_concurrency_at_onion(dataset_name)
@@ -228,9 +228,6 @@ class PreProcessedNoFullPipelineState(State):
 
         # precision_recall_curve_with_threshold_multiple_session_durations.pdf
         results_plot_maker.precision_recall_curve_with_threshold_multiple_session_durations(FIGURES_PAPER_RESULTS_FOLDER, self.results_by_min_duration, self.flow_count_by_duration_correlated, dataset_name) 
-
-        # session_results_statistics_cdfs.pdf
-        results_plot_maker.session_results_statistics(FIGURES_PAPER_RESULTS_FOLDER, self.metrics_map_final_scores_per_session, captures_folder_test, dataset_name, threshold=threshold)
 
     def plot(self, captures_folder_test: str, dataset_name: str, threshold: float) -> None:
         super().plot()
@@ -297,9 +294,6 @@ class PreProcessedFullPipelineState(State):
     
     def plot(self) -> None:
         super().plot()
-        print("self.results_by_min_duration 0: ", self.results_by_min_duration[self.sss.thresholds[0]][480])
-        print("self.results_by_min_duration 1: ", self.results_by_min_duration[self.sss.thresholds[-1]][480])
-        print("self.results_by_min_duration 100: ", self.results_by_min_duration[self.sss.thresholds[100]][480])
         results_plot_maker.precision_recall_curve_with_threshold_multiple_session_durations(FIGURES_FULL_PIPELINE_RESULTS_FOLDER, self.results_by_min_duration, self.flow_count_by_duration_correlated, self.sss.dataset_name)
     
 class PreProcessedPartialCoveragePercentageState(State):
@@ -392,6 +386,11 @@ class PreProcessedPartialCoverageStateByContinent(State):
                 self.possible_request_combinations[(client_session_id, onion_session_id)] = baseline_possible_request_combinations[(client_session_id, onion_session_id)]
 
 def get_cache_filename(dataset_name):
+    if not os.path.isdir(RESULTS_FOLDER):
+        os.mkdir(RESULTS_FOLDER)
+    if not os.path.isdir(DATA_RESULTS_FOLDER):
+        os.mkdir(DATA_RESULTS_FOLDER)
+
     return f"{DATA_RESULTS_FOLDER}sliding_subset_sum_{dataset_name}.pickle"
 
 def dump_instance_decorator(arg_index):
@@ -430,7 +429,7 @@ class SlidingSubsetSum:
     pre_processed_partial_coverage_percentage_states_by_coverage: Dict[float, PreProcessedPartialCoveragePercentageState]
 
     # TODO: make alternate __init__ function that starts hyperparameters with hyperparameter tuning
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __init__(self, 
                  dataset_name,
                  epoch_size, 
@@ -574,20 +573,20 @@ class SlidingSubsetSum:
                     window_size: {self.pre_processed_full_pipeline_state.window_size};
                     overlap: {self.pre_processed_full_pipeline_state.overlap};
                     delta: {self.pre_processed_full_pipeline_state.delta}\n
-                    current state: {self.state}\n
-                    # pairs of flows: {len(self.state.possible_request_combinations)}\n
                     """
+                    # current state: {self.state}\n
+                    # pairs of flows: {len(self.state.possible_request_combinations)}\n
                     # # client flows: {len(self.state.client_flows)}\n
                     # # onion flows: {len(self.state.onion_flows)}\n
                     
     
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __pre_process(self, dataset_name, is_full_pipeline: bool) -> None:
         if is_full_pipeline == False:
             self.pre_processed_no_full_pipeline_state.toggle_state()
         else:
             self.pre_processed_full_pipeline_state.toggle_state()
-        logging.info(f"Toggled state {self.state}")
+        #logging.info(f"Toggled state {self.state}")
 
         if len(self.state.possible_request_combinations) == 0:
             self.state.pre_process()
@@ -667,7 +666,7 @@ class SlidingSubsetSum:
                 # predicted as not correlated
                 self.state.predictions[threshold][(client_session_id, onion_session_id)] = Prediction(final_score=final_score, label=0)
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __predict(self, dataset_name: str) -> None:
         if len(self.state.database) == 0:
             self.__run_windowed_subset_sum_on_all_pairs()
@@ -729,7 +728,7 @@ class SlidingSubsetSum:
             performance_metrics.calculate_performance_scores()
         self.state.metrics_map_final_scores[threshold].calculate_performance_scores()
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __evaluate_confusion_matrix(self, dataset_name) -> None:
         if len(self.state.metrics_map) == 0:
             for i, (threshold, pair_preds) in tqdm(enumerate(self.state.predictions.items()), desc="Evaluating confusion matrix per threshold ..."):
@@ -740,7 +739,7 @@ class SlidingSubsetSum:
         else:
             logging.info("Already had data on evaluate_confusion_matrix()")
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __evaluate_by_duration(self, dataset_name, is_full_pipeline=False) -> None:
         if len(self.state.results_by_min_duration) == 0:
             for threshold in self.thresholds:
@@ -796,7 +795,7 @@ class SlidingSubsetSum:
         else:
             logging.info("Already had data on evaluate_by_duration()")
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __evaluate_by_client(self, dataset_name) -> None:
         if len(self.state.metrics_map_per_client) == 0:
             for threshold in self.thresholds:
@@ -824,7 +823,7 @@ class SlidingSubsetSum:
         else:
             logging.info("Already had data on evaluate_by_client()")
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __evaluate_by_os(self, dataset_name) -> None:
         if len(self.state.metrics_map_per_onion) == 0:
             for threshold in self.thresholds:
@@ -857,11 +856,8 @@ class SlidingSubsetSum:
         else:
             logging.info("Already had data on evaluate_by_os()")
 
+    @dump_instance_decorator(arg_index=1)
     def correlate_sessions(self, dataset_name, is_full_pipeline=False) -> None:
-        if not os.path.isdir(RESULTS_FOLDER):
-            os.mkdir(RESULTS_FOLDER)
-        if not os.path.isdir(DATA_RESULTS_FOLDER):
-            os.mkdir(DATA_RESULTS_FOLDER)
         self.__pre_process(dataset_name, is_full_pipeline)
         self.__predict(dataset_name)
         self.__evaluate_confusion_matrix(dataset_name)
@@ -869,10 +865,10 @@ class SlidingSubsetSum:
         self.__evaluate_by_client(dataset_name)
         self.__evaluate_by_os(dataset_name)
 
-    def plot_paper_results(self, captures_folder_test: str, dataset_name: str) -> None:
+    def plot_paper_results(self, dataset_name: str) -> None:
         chosen_threshold = 0
         self.pre_processed_no_full_pipeline_state.toggle_state()
-        self.state.plot_paper_results(captures_folder_test, dataset_name, self.thresholds[chosen_threshold])
+        self.state.plot_paper_results(dataset_name, self.thresholds[chosen_threshold])
 
     def plot(self, captures_folder_test: str, dataset_name: str) -> None:
         chosen_threshold = 0
@@ -883,11 +879,11 @@ class SlidingSubsetSum:
         self.pre_processed_full_pipeline_state.toggle_state()
         self.state.plot()
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __pre_process_state(self, dataset_name: str) -> None:
         self.state.pre_process()
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def evaluate_coverage_by_eu_country(self, dataset_name: str):
         for zone, percentage in self.coverage_percentages.items():
             self.pre_processed_partial_coverage_percentage_states_by_coverage[percentage].toggle_state()
@@ -905,11 +901,11 @@ class SlidingSubsetSum:
         self.pre_processed_partial_coverage_percentage_states_by_coverage[1].plot()
         results_plot_maker_partial_coverage.precision_recall_curve_with_threshold_by_eu_country(self.metrics_map_final_scores, self.coverage_percentage.values(), dataset_name)
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def __filter_by_zone_state(self, dataset_name: str) -> None:
         self.state.filter_by_zone(self.pre_processed_partial_coverage_states_by_continent['baseline'].possible_request_combinations)
 
-    @dump_instance_decorator(arg_index=1)
+    #@dump_instance_decorator(arg_index=1)
     def evaluate_coverage_by_continent(self, dataset_name: str):
         self.pre_processed_partial_coverage_states_by_continent['baseline'].toggle_state()
         if len(self.state.possible_request_combinations) == 0:

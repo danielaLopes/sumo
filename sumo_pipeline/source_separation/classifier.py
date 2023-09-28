@@ -23,7 +23,8 @@ sklearn.set_config(assume_finite=True)
 LABEL_INDEX = -2
 CAPTURE_INDEX = -1
 
-DECISION_THRESHOLD = 0.9
+#DECISION_THRESHOLD = 0.9
+DECISION_THRESHOLD = 0.0010103702079504728 # For reproducibility
 
 models_folder = 'models/'
 
@@ -227,9 +228,9 @@ def plot_precision_recall_curve(y_test, probas_, isValidation=False):
 
 def plot_precision_recall_curve_zoomin(statsFileTest, model_save_file, results_file):
     
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
-        model = joblib.load(models_folder+model_save_file)
+        model = joblib.load(model_save_file)
     else:
         print("You have to train source separation's model first!")
         print("Exiting ...")
@@ -323,7 +324,7 @@ def hyperparameter_tuning(statsFileTrain, statsFileValidate, statsFileTest, algo
     hyperparameter_tuning.search_parameters()
 
 def test(statsFileTest, model_save_file):
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
         model = joblib.load(models_folder+model_save_file)
     else:
@@ -342,9 +343,9 @@ def test(statsFileTest, model_save_file):
 
 def test_full_pipeline(dataset_name, statsFileTest, model_save_file, optimal_thr=True):
 
-    if os.path.isfile(models_folder+model_save_file):
+    if os.path.isfile(model_save_file):
         print("Gathering trained model ...")
-        model = joblib.load(models_folder+model_save_file)
+        model = joblib.load(model_save_file)
     else:
         print("You have to train source separation's model first!")
         print("Exiting ...")
@@ -361,9 +362,10 @@ def test_full_pipeline(dataset_name, statsFileTest, model_save_file, optimal_thr
 
     if optimal_thr == True:
         decision_threshold = optimal_threshold(tpr, fpr, thresholds)
-        print("decision_threshold", decision_threshold)
+        print(f"Using optimized decision threshold {decision_threshold}")
     else:
         decision_threshold = DECISION_THRESHOLD
+        print(f"Using default decision threshold {decision_threshold}")
 
     dump_pipeline_features(dataset_name, X_test, probas_[:, 1], test_captures, decision_threshold)
     
@@ -381,6 +383,7 @@ def dump_pipeline_features(dataset_name, features, predictions, captures, decisi
             outputClientFeatures[captures.iloc[i]] = features.iloc[i]
         else:
             outputOSFeatures[captures.iloc[i]] = features.iloc[i]
+    print(f"Dumping features for threshold {decision_threshold}")
 
     features_folder = 'full_pipeline_features/'
     if not os.path.exists(features_folder):
