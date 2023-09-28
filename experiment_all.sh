@@ -1,4 +1,5 @@
-echo "\n\n### Running setup.sh"
+echo "\n\n### Running setup.sh (requires sudo)"
+#./setup.sh packages # this will prompt for sudo (needed for certain packages)
 ./setup.sh 
 
 echo "\n\n### Running experiment1.sh"
@@ -25,8 +26,8 @@ echo "\n\n### Running experiment4_setup.sh"
 echo "\n\n### Running experiment4.sh"
 ./experiment4.sh
 
-echo "\n\n### Running experiment5_setup.sh"
-./experiment5_setup.sh
-
 echo "\n\n### Running experiment5.sh"
 ./experiment5.sh
+
+echo "\n\n### Running experiment5_results.sh"
+./experiment5_results.sh

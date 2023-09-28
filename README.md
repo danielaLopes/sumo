@@ -53,6 +53,7 @@ We expect this to take a maximum of xxx.
 We expect this to take a maximum of 1 hour. 
 ```
 ./experiment5.sh
+./experiment5_results.sh
 ```
 
 
