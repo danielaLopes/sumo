@@ -13,16 +13,14 @@ cd ../../
 # execute DeepCoFFEA
 cd dl_comparisons
 mkdir samples_deepcoffea
-for i in $(seq 10)
+for i in $(seq 5)
 do
   touch samples_deepcoffea/sample_deepcoffea_s$i
-  echo " === DeepCoFFEA RUN=$i PAIRS=$pairs === "
-  python3 performance.py deepcoffea $pairs >> samples_deepcoffea/sample_deepcoffea_s$i
+  echo " === DeepCoFFEA RUN=$i === "
+  # python3 performance.py deepcoffea $pairs >> samples_deepcoffea/sample_deepcoffea_s$i
 done
 mv ./samples_deepcoffea ../$FOLDER_EXP5
-cd ..
-
-cd $FOLDER_EXP5
+cd ../$FOLDER_EXP5
 
 cd samples_subsetsum2d
 for f in sample_subsetsum2d_s*
@@ -36,6 +34,8 @@ do
 	rm col1_$f col2_$f col3_$f
 done
 cd ..
+
+cd $FOLDER_EXP5
 
 cd samples_deepcoffea
 for f in sample_deepcoffea_s*
