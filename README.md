@@ -82,27 +82,45 @@ The pre-trained models used to take the paper results are available in [![DOI](h
 #### Source separation
 ```
 cd sumo_pipeline/source_separation
+python app.py --help
+python app.py [COMMAND] --help
 ```
-
-Train the model:
-```
-
-```
-
 
 
 #### Target separation
+```
+cd sumo_pipeline/target_separation
+python app.py --help
+python app.py [COMMAND] --help
+```
 
 
 ### Matching phase
 #### Correlation
+```
+cd sumo_pipeline/session_correlation
+python app.py --help
+python app.py [COMMAND] --help
+```
 
 
 
 ### Comparison with DeepCorr / DeepCoFFEA
+The SUMo features converted to the DeepCoFFEA format are available at:
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8386335.svg)](https://zenodo.org/record/8386335/files/sumo_features_for_deepcoffea.tar.gz)
 
 
 ### Throughput/latency
 
 To collect the latency/throughput metrics of SUMo follow the instructions in (throughput_sumo.sh)[./experiments/throughput_sumo.sh]. It should output a plot in `sumo/experiments/plot_subsetsum2d.pdf` with the latency/throughput curve of our solution.
 
+
+### Guard coverage
+#### Study Tor relays in client circuit
+```
+cd guard_coverage
+```
+
+* Execute tor_client_stem.ipynb to obtain ./results/data/client_guard_nodes.joblib, client_middle_nodes.joblib, ./results/data/client_exit_nodes.joblib
+
+* Plot client-side guard coverage per ISP, per AS and per country by executing plot_guard_probabilities_client_only.ipynb
