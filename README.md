@@ -2,10 +2,6 @@
 
 This repository presents the code for the artefact evaluation for The Network and Distributed System Security Symposium (NDSS) 2024.
 
-### If you make use of our work please cite our NDSS'24 paper:
-
-"Flow Correlation Attacks on Tor Onion Service Sessions with Sliding Subset Sum". Daniela Lopes, Jin-Dong Dong, Daniel Castro, Pedro Medeiros, Diogo Barradas, Bernardo Portela, João Vinagre, Bernardo Ferreira, Nicolas Christin, and Nuno Santos. The Network and Distributed System Security Symposium (NDSS) 2024.
-
 ## Artifact Evaluation
 
 We make available a set of scripts to run all the experiments that reproduce the main results of the paper. The whole set of experiments can be executed by running:
@@ -41,23 +37,12 @@ We expect this to take a maximum of 1 hour.
 ./experiment3_results.sh
 ```
 
-#### Experiment (E4) Comparison with the State-of-the-Art on Flow Correlation
-We expect this to take a maximum of xxx. 
+#### Experiment (E4) Throughput Evaluation
+We expect this to take a maximum of 1 hour. 
 ```
-./experiment4_setup.sh
 ./experiment4.sh
 ./experiment4_results.sh
 ```
-
-#### Experiment (E5) Throughput Evaluation
-We expect this to take a maximum of 1 hour. 
-```
-./experiment5.sh
-./experiment5_results.sh
-```
-
-
-
 
 
 ## Installation
@@ -113,7 +98,7 @@ The SUMo features converted to the DeepCoFFEA format are available at:
 
 ### Throughput/latency
 
-To collect the latency/throughput metrics of SUMo follow the instructions in (experience5.sh)[./experiment5.sh]. It should output a plot in `experiment5/plot_subsetsum2d.pdf` with the latency/throughput curve of our solution. The script also prints the point with maximum throughput.
+To collect the latency/throughput metrics of SUMo follow the instructions in (experience5.sh)[./experiment4.sh]. It should output a plot in `experiment4/plot_subsetsum2d.pdf` with the latency/throughput curve of our solution. The script also prints the point with maximum throughput.
 
 
 ### Guard coverage
@@ -125,3 +110,8 @@ cd guard_coverage
 * Execute tor_client_stem.ipynb to obtain ./results/data/client_guard_nodes.joblib, client_middle_nodes.joblib, ./results/data/client_exit_nodes.joblib
 
 * Plot client-side guard coverage per ISP, per AS and per country by executing plot_guard_probabilities_client_only.ipynb
+
+
+# If you make use of our work please cite our NDSS'24 paper:
+
+"Flow Correlation Attacks on Tor Onion Service Sessions with Sliding Subset Sum". Daniela Lopes, Jin-Dong Dong, Daniel Castro, Pedro Medeiros, Diogo Barradas, Bernardo Portela, João Vinagre, Bernardo Ferreira, Nicolas Christin, and Nuno Santos. The Network and Distributed System Security Symposium (NDSS) 2024.

@@ -13,7 +13,8 @@ fi
 
 echo "Downloading OSTrain, OSValidate, and OSTest extracted features in DeepCoFFEA's format ..."
 curl -o sumo_features_for_deepcoffea.tar.gz -L "https://zenodo.org/record/8386335/files/sumo_features_for_deepcoffea.tar.gz?download=1"
-tar -xf sumo_features_for_deepcoffea.tar.gz
+echo "Extracting sumo_features_for_deepcoffea.tar.gz"
+tar -xfv sumo_features_for_deepcoffea.tar.gz
 
 echo "Converting SUMo's features into DeepCoFFEA's features ..."
 python3 sumo_to_deepcoffea_features.py
