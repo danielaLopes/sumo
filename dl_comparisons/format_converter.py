@@ -12,6 +12,7 @@ import re
 import traceback
 import glob
 import os
+import shutil
 
 import dpkt
 
@@ -254,8 +255,9 @@ def deepcoffea_map(train_path, val_path, output_path=None):
     if not outflow_dir.exists():
         outflow_dir.mkdir()
     for k, v in path_map.items():
-        print(f"{k} ---> {v}")
-        pathlib.Path(v).symlink_to(k)
+        #print(f"{k} ---> {v}")
+        shutil.copyfile(k, v)
+        #pathlib.Path(v).symlink_to(k)
 
 
 def inet_to_str(inet):
