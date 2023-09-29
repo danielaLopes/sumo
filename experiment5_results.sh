@@ -1,6 +1,6 @@
 # same as experiment4.sh
 
-FOLDER_EXP5=experiment4
+FOLDER_EXP5=experiment5
 
 cp throughput_data/plot.py ./$FOLDER_EXP5
 cd $FOLDER_EXP5
