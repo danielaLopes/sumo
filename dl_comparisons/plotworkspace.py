@@ -414,9 +414,7 @@ def get_tprsfprsprs_globalthr(corr_matrix, n_wins, vote_thr):
 
 
 if deepcoffea:
-    # TODO: change path
-    #best_npz_path = pathlib.Path("experiments/deepcoffea_data230521_d3.0_ws5.0_nw5_thr20_tl300_el500_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-975_loss0.00199_metrics.npz")
-    best_npz_path = pathlib.Path("/mnt/nas-shared/torpedo/ml_experiments_plots/snapshots/deepcoffea_models/deepcoffea_data230521_d3.0_ws5.0_nw5_thr20_tl300_el500_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-975_loss0.00199_metrics.npz")
+    best_npz_path = pathlib.Path("deepcoffea_models/deepcoffea_data230521_d3.0_ws5.0_nw5_thr20_tl300_el500_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-975_loss0.00199_metrics.npz")
     lsetup = "_".join(best_npz_path.parent.name.split("_")[-12:-9])
 
     result_fpath = pathlib.Path("./datasets/stats/lthr.p")
@@ -448,10 +446,8 @@ if deepcoffea:
 
 
     npz_paths = [
-        #"experiments/deepcoffea_data230521_d2.0_ws3.0_nw7_thr15_tl200_el300_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-1441_loss0.00292_metrics.npz",
-        #"experiments/deepcoffea_data230521_d3.0_ws5.0_nw5_thr20_tl300_el500_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-975_loss0.00199_metrics.npz"
-        "/mnt/nas-shared/torpedo/ml_experiments_plots/snapshots/deepcoffea_models/deepcoffea_data230521_d2.0_ws3.0_nw7_thr15_tl200_el300_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-1441_loss0.00292_metrics.npz",
-        "/mnt/nas-shared/torpedo/ml_experiments_plots/snapshots/deepcoffea_models/deepcoffea_data230521_d3.0_ws5.0_nw5_thr20_tl300_el500_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-975_loss0.00199_metrics.npz"
+        "deepcoffea_models/deepcoffea_data230521_d2.0_ws3.0_nw7_thr15_tl200_el300_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-1441_loss0.00292_metrics.npz",
+        "deepcoffea_models/deepcoffea_data230521_d3.0_ws5.0_nw5_thr20_tl300_el500_nt0_ap1e-01_es64_lr1e-03_mep100000_bs256/ep-975_loss0.00199_metrics.npz"
     ]
 
     result_fpath = pathlib.Path("./datasets/stats/gthr.p")
