@@ -1,7 +1,7 @@
 #!/bin/bash
 
-FOLDER_EXP5=experiment5
-mkdir experiment5
+FOLDER_EXP5=experiment4
+mkdir experiment4
 
 # execute SUMo
 if [ ! -d ./$FOLDER_EXP5/samples_subsetsum2d ]
