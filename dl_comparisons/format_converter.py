@@ -254,7 +254,7 @@ def deepcoffea_map(train_path, val_path, output_path=None):
     if not outflow_dir.exists():
         outflow_dir.mkdir()
     for k, v in path_map.items():
-        #print(k, v)
+        print(f"{k} ---> {v}")
         pathlib.Path(v).symlink_to(k)
 
 
