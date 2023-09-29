@@ -1,3 +1,5 @@
+#!/bin/bash
+
 mkdir experiment2
 
 cd sumo_pipeline/session_correlation

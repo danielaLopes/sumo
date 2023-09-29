@@ -21,20 +21,20 @@ Run the following script to install dependencies and compile the C code necessar
 ```
 
 #### Experiment (E1) Session Matching with Perfect Filtering Phase
-We expect this to take a maximum of 40 minutes. 
+We expect this to take a maximum of 40 minutes. This will generate plots in ./experiment1 
 ```
 ./experiment1.sh
 ./experiment1_results.sh
 ```
 
 #### Experiment (E2) Session Matching with Partial Coverage
-We expect this to take a maximum of 2.5 hours. 
+We expect this to take a maximum of 2.5 hours. This will generate plots in ./experiment2
 ```
 ./experiment2.sh
 ```
 
 #### Experiment (E3) Session Matching with Imperfect Filtering Phase
-We expect this to take a maximum of 1 hour. 
+We expect this to take a maximum of 1 hour. This will generate plots in ./experiment3
 ```
 ./experiment3_setup.sh
 ./experiment3.sh
@@ -42,7 +42,7 @@ We expect this to take a maximum of 1 hour.
 ```
 
 #### Experiment (E4) Comparison with the State-of-the-Art on Flow Correlation
-We expect this to take a maximum of xxx. 
+We expect this to take a maximum of xxx. This will generate plots in ./experiment4
 ```
 ./experiment4_setup.sh
 ./experiment4.sh
@@ -50,7 +50,7 @@ We expect this to take a maximum of xxx.
 ```
 
 #### Experiment (E5) Throughput Evaluation
-We expect this to take a maximum of 1 hour. 
+We expect this to take a maximum of 1 hour. This will generate plots in ./experiment5
 ```
 ./experiment5.sh
 ```

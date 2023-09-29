@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Uncomment if running in personal machine. 
 # Requires sudo
 #echo "\n\n### Running setup.sh"
