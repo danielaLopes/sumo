@@ -25,6 +25,7 @@ if [ ! -d "deepcoffea_models" ]; then
     tar -xf deepcoffea_models.tar.gz
 fi
 
+cd .. # get back to dl_comparisons
 # Generates datasets/datasets_20230521_train_deepcoffea/ and datasets/datasets_20230521_test_deepcoffea/
 echo "Converting SUMo's features into DeepCoFFEA's features ..."
 python3 sumo_to_deepcoffea_features.py
