@@ -3,6 +3,7 @@
 This repository presents the code for the artefact evaluation for The Network and Distributed System Security Symposium (NDSS) 2024.
 
 ## Artifact Evaluation
+Repository: [![DOI](https://zenodo.org/badge/693254187.svg)](https://zenodo.org/badge/latestdoi/693254187)
 
 We make available a set of scripts to run all the experiments that reproduce the main results of the paper. The whole set of experiments can be executed by running:
 ```
@@ -104,6 +105,9 @@ python app.py [COMMAND] --help
 ### Comparison with DeepCorr / DeepCoFFEA
 The SUMo features converted to the DeepCoFFEA format are available at:
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8386335.svg)](https://zenodo.org/record/8386335/files/sumo_features_for_deepcoffea.tar.gz)
+
+The DeepCoFFEA models trained with SUMos data are available at:
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8388196.svg)](https://zenodo.org/record/8386335/files/deepcoffea_models.tar.gz)
 
 
 ### Throughput/latency
