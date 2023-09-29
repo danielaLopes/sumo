@@ -1,26 +1,9 @@
-#!/bin/bash
+# same as experiment4.sh
 
 FOLDER_EXP5=experiment5
-mkdir experiment5
 
-# execute SUMo
 cp throughput_data/plot.py ./$FOLDER_EXP5
-cd sumo_pipeline/session_correlation
-# bash ./testPerformanceOnGPU.sh
-mv ./samples_subsetsum2d ../../$FOLDER_EXP5
-cd ../../
-
-# execute DeepCoFFEA
-cd dl_comparisons
-mkdir samples_deepcoffea
-for i in $(seq 5)
-do
-  touch samples_deepcoffea/sample_deepcoffea_s$i
-  echo " === DeepCoFFEA RUN=$i === "
-  # python3 performance.py deepcoffea $pairs >> samples_deepcoffea/sample_deepcoffea_s$i
-done
-mv ./samples_deepcoffea ../$FOLDER_EXP5
-cd ../$FOLDER_EXP5
+cd $FOLDER_EXP5
 
 cd samples_subsetsum2d
 for f in sample_subsetsum2d_s*

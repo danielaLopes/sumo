@@ -9,5 +9,5 @@ fi
 
 
 echo "Obtaining subsetsumopencl2d.so ..."
-cd sumo/sumo_pipeline/session_correlation
+cd sumo_pipeline/session_correlation
 make torpedosubsetsumopencl2d.so

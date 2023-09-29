@@ -437,10 +437,10 @@ if deepcoffea:
 
 
     ltprs, lfprs, lprs = {}, {}, {}
-    with open("./datasets/stats/lthr.p", "rb") as fp:
+    with open(result_fpath, "rb") as fp:
         ltprs['d3.0_ws5.0_nw5'], lfprs['d3.0_ws5.0_nw5'], lprs['d3.0_ws5.0_nw5'] = pickle.load(fp)
 
-    with open("./datasets/stats/lthr_d2.p", "rb") as fp:
+    with open(result_fpath2, "rb") as fp:
         ltprs['d2.0_ws3.0_nw7'], lfprs['d2.0_ws3.0_nw7'], lprs['d2.0_ws3.0_nw7'] = pickle.load(fp)
 
 
