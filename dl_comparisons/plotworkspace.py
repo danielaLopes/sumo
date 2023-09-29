@@ -132,11 +132,11 @@ axs[1].set_ylim(top=9000)
 axs[1].grid(axis='y')
 
 fig.tight_layout()
-results_dir = "datasets/stats"
+results_dir = "datasets/stats/"
 if not os.path.isdir(results_dir):
     os.mkdir(results_dir)
-fig.savefig(f"datasets/stats/all_npkts_wdc.pdf")
-fig.savefig(f"datasets/stats/all_npkts_wdc.png")
+fig.savefig(f"{results_dir}all_npkts_wdc.pdf")
+fig.savefig(f"{results_dir}all_npkts_wdc.png")
 
 
 # In[ ]:

@@ -1,6 +1,7 @@
 import json
 import pickle
 import pathlib
+import os
 
 import numpy as np
 from tqdm import tqdm
@@ -153,6 +154,8 @@ def compute_deepcoffea_stats(data_root):
         up_bytes = []
 
         for flow_f in tqdm(flow_fs, ascii=True, ncols=120):
+            if not os.path.isfile(flow_f):
+                continue
             with open(flow_f) as fp:
                 content = fp.read()
 
