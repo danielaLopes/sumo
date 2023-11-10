@@ -18,8 +18,6 @@ do
 done
 cd ..
 
-cd $FOLDER_EXP5
-
 cd samples_deepcoffea
 for f in sample_deepcoffea_s*
 do
