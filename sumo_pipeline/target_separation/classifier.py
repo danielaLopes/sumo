@@ -25,7 +25,8 @@ CAPTURE_INDEX = -1
 
 THRESHOLD = 0.9
 
-models_folder = 'models/'
+MODELS_FOLDER = 'models/'
+RESULTS_FOLDER = 'results/'
 
 
 plt.rc('font', size=16)          # controls default text sizess
@@ -46,9 +47,9 @@ def store_model(model, X_train, save_file_name):
     # Save features names
     model.feature_names = list(X_train.columns.values)
 
-    if not os.path.exists(models_folder):
-        os.makedirs(models_folder)
-    joblib.dump(model, models_folder+save_file_name)
+    if not os.path.exists(MODELS_FOLDER):
+        os.makedirs(MODELS_FOLDER)
+    joblib.dump(model, os.path.join(MODELS_FOLDER, save_file_name))
 
 
 class HyperparameterTuning:
@@ -99,7 +100,7 @@ class HyperparameterTuning:
         end_time = time.time()
         print("\n=== Hyperparameter tuning time: {}".format(end_time - start_time))
 
-        with open(models_folder+'log_parameters.txt', 'a') as f:
+        with open(os.path.join(MODELS_FOLDER, 'log_parameters.txt'), 'a') as f:
             f.write(f"Hyperparameter tuning time: {end_time - start_time}\n")
 
         model_save_file = self.store_model(opt_model)
@@ -122,11 +123,12 @@ class BayesianOptimization(HyperparameterTuning):
         # Loss is negative score
         loss = - score
 
-        if not os.path.isfile(models_folder+'log_parameters.txt'):
+        log_parameters_path = os.path.join(MODELS_FOLDER, 'log_parameters.txt')
+        if not os.path.isfile(log_parameters_path):
             write_mode = 'w'
         else:
             write_mode = 'a'
-        with open(models_folder+'log_parameters.txt', write_mode) as f:
+        with open(log_parameters_path, write_mode) as f:
             f.write(f"Hyperparameters: {params}\n")
             f.write(f"Loss: {loss}\n\n")
 
@@ -140,9 +142,10 @@ class BayesianOptimization(HyperparameterTuning):
         print("\n=== Parameter search with BayesianOptimization  ...")
         
         save_file_name = 'best_hyperparameters_target_separation.joblib'
-        if os.path.isfile(models_folder+save_file_name):
+        save_file_path = os.path.join(MODELS_FOLDER, save_file_name)
+        if os.path.isfile(save_file_path):
             print("\n=== Loading existing parameters ...")
-            best_hyperparameters = joblib.load(models_folder+save_file_name)
+            best_hyperparameters = joblib.load(save_file_path)
             print("\n--- best_hyperparameters", best_hyperparameters)
             return best_hyperparameters
 
@@ -172,9 +175,9 @@ class BayesianOptimization(HyperparameterTuning):
         # Print the values of the best parameters
         print("\n--- best_hyperparameters", best_hyperparameters)
         
-        if not os.path.exists(models_folder):
-            os.makedirs(models_folder)
-        joblib.dump(best_hyperparameters, models_folder+save_file_name)
+        if not os.path.exists(MODELS_FOLDER):
+            os.makedirs(MODELS_FOLDER)
+        joblib.dump(best_hyperparameters, os.path.join(MODELS_FOLDER, save_file_name))
 
         return best_hyperparameters
 
@@ -270,11 +273,10 @@ def plot_precision_recall_curve_zoomin(stats_file_test, model_save_file, results
 
     plt.tight_layout()
 
-    results_folder = 'results/'
-    if not os.path.exists(results_folder):
-        os.makedirs(results_folder)
-    plt.savefig(results_folder + '{}.pdf'.format(results_file))
-    plt.savefig(results_folder + '{}.png'.format(results_file))
+    if not os.path.exists(RESULTS_FOLDER):
+        os.makedirs(RESULTS_FOLDER)
+    plt.savefig(os.path.join(RESULTS_FOLDER, f'{results_file}.pdf'))
+    plt.savefig(os.path.join(RESULTS_FOLDER, f'{results_file}.png'))
 
 
 def plot_precision_recall_curve(y_test, probas_, is_validation=False, is_full_pipeline=False):
@@ -296,24 +298,26 @@ def plot_precision_recall_curve(y_test, probas_, is_validation=False, is_full_pi
     plt.legend()
     plt.tight_layout()
 
-    results_folder = 'results/'
-    if not os.path.exists(results_folder):
-        os.makedirs(results_folder)
+    if not os.path.exists(RESULTS_FOLDER):
+        os.makedirs(RESULTS_FOLDER)
     if is_full_pipeline == True:
-        plt.savefig(results_folder + 'precision_recall_curve_target_separation_full_pipeline.pdf')
-        plt.savefig(results_folder + 'precision_recall_curve_target_separation_full_pipeline.png')
+        plt.savefig(os.path.join(RESULTS_FOLDER, 'precision_recall_curve_target_separation_full_pipeline.pdf'))
+        plt.savefig(os.path.join(RESULTS_FOLDER, 'precision_recall_curve_target_separation_full_pipeline.png'))
     elif is_validation == True:
-        plt.savefig(results_folder + 'precision_recall_curve_target_separation_validation.pdf')
-        plt.savefig(results_folder + 'precision_recall_curve_target_separation_validation.png')
+        plt.savefig(os.path.join(RESULTS_FOLDER, 'precision_recall_curve_target_separation_validation.pdf'))
+        plt.savefig(os.path.join(RESULTS_FOLDER, 'precision_recall_curve_target_separation_validation.png'))
     else:
-        plt.savefig(results_folder + 'precision_recall_curve_target_separation.pdf')
-        plt.savefig(results_folder + 'precision_recall_curve_target_separation.png')
+        plt.savefig(os.path.join(RESULTS_FOLDER, 'precision_recall_curve_target_separation.pdf'))
+        plt.savefig(os.path.join(RESULTS_FOLDER, 'precision_recall_curve_target_separation.png'))
 
 
 def gather_dataset(statsFile):
     stats = pd.read_csv(statsFile) 
 
     print("stats before:", stats)
+
+    # TODO: Uncomment this when models are retrained
+    #stats = stats.drop(['Unnamed: 0'], axis=1)
 
     # Transform dtype object columns to numeric
     cols = stats[stats.columns[:LABEL_INDEX]].select_dtypes(exclude=['float']).columns
@@ -381,9 +385,9 @@ def train(plFileTrain, statsFileTrain, model_save_file):
 
     model.feature_names = list(X_train.columns.values)
     
-    if not os.path.exists(models_folder):
-        os.makedirs(models_folder)
-    joblib.dump(model, models_folder+model_save_file)
+    if not os.path.exists(MODELS_FOLDER):
+        os.makedirs(MODELS_FOLDER)
+    joblib.dump(model, os.path.join(MODELS_FOLDER, model_save_file))
 
 
 def hyperparameter_tuning(plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, stats_file_test, algorithm='GridSearch'):
@@ -450,3 +454,23 @@ def test_full_pipeline(dataset_name, model_save_file):
     pickle.dump(outputClientFeatures, open(features_folder+'client_features_target_separation_thr_{}_{}.pickle'.format(THRESHOLD, dataset_name), 'wb'))
 
     return probas_
+
+def top10_features(statsFileTest: str, model_save_file: str) -> list[str]:
+    model_save_path = os.path.join(MODELS_FOLDER, model_save_file)
+    if os.path.isfile(model_save_path):
+        print("Gathering trained model ...")
+        model = joblib.load(model_save_path)
+    else:
+        print("You have to train source separation's model first!")
+        print("Exiting ...")
+        exit()
+
+    X_test, _= gather_dataset(statsFileTest)
+    
+    feat_importances = pd.Series(model.feature_importances_, index=X_test.columns)
+    feat_importances.nlargest(10).plot(kind='barh')
+    plt.savefig(f'{RESULTS_FOLDER}feat_importances_source_separation.png', bbox_inches='tight')
+    plt.savefig(f'{RESULTS_FOLDER}feat_importances_source_separation.pdf', bbox_inches='tight')
+    
+    print(feat_importances.nlargest(10).index)
+    return feat_importances.nlargest(10).index

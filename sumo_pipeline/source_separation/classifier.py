@@ -26,7 +26,8 @@ CAPTURE_INDEX = -1
 #DECISION_THRESHOLD = 0.9
 DECISION_THRESHOLD = 0.0010103702079504728 # For reproducibility
 
-models_folder = 'models/'
+MODELS_FOLDER = 'models/'
+RESULTS_FOLDER = 'results/'
 
 
 plt.rc('font', size=16)          # controls default text sizess
@@ -47,22 +48,22 @@ def store_model(model, X_train, save_file_name):
     # Save features names
     model.feature_names = list(X_train.columns.values)
 
-    if not os.path.exists(models_folder):
-        os.makedirs(models_folder)
-    joblib.dump(model, models_folder+save_file_name)
+    if not os.path.exists(MODELS_FOLDER):
+        os.makedirs(MODELS_FOLDER)
+    joblib.dump(model, os.path.join(MODELS_FOLDER, save_file_name))
     
 
 # TODO: Test hyperparameter tuning
 class HyperparameterTuning:
 
-    def __init__(self, plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, statsFileTest):
+    def __init__(self, statsFileTrain, statsFileValidate, statsFileTest):
         print("\n=== Gathering training dataset ...")
-        self.X_train, self.y_train, _ = gather_dataset(plFileTrain, statsFileTrain)
+        self.X_train, self.y_train, _ = gather_dataset(statsFileTrain)
         print("self.X_train", self.X_train)
         print("\n=== Gathering validation dataset ...")
-        self.X_validate, self.y_validate, _ = gather_dataset(plFileValidate, statsFileValidate)
+        self.X_validate, self.y_validate, _ = gather_dataset(statsFileValidate)
         print("\n=== Gathering testing dataset ...")
-        self.X_test, self.y_test, _ = gather_dataset(plFileTest, statsFileTest)
+        self.X_test, self.y_test, _ = gather_dataset(statsFileTest)
 
     def search_method(self):
         pass
@@ -102,7 +103,7 @@ class HyperparameterTuning:
         end_time = time.time()
         print("\n=== Hyperparameter tuning time: {}".format(end_time - start_time))
 
-        with open(models_folder+'log_parameters.txt', 'a') as f:
+        with open(os.path.join(MODELS_FOLDER, 'log_parameters.txt'), 'a') as f:
             f.write(f"Hyperparameter tuning time: {end_time - start_time}\n")
 
         model_save_file = self.store_model(opt_model)
@@ -126,11 +127,12 @@ class BayesianOptimization(HyperparameterTuning):
         # Loss is negative score
         loss = -score
 
-        if not os.path.isfile(models_folder+'log_parameters.txt'):
+        log_parameters_path = os.path.join(MODELS_FOLDER, 'log_parameters.txt')
+        if not os.path.isfile(log_parameters_path):
             write_mode = 'w'
         else:
             write_mode = 'a'
-        with open(models_folder+'log_parameters.txt', write_mode) as f:
+        with open(log_parameters_path, write_mode) as f:
             f.write(f"Hyperparameters: {params}\n")
             f.write(f"Loss: {loss}\n\n")
 
@@ -143,10 +145,10 @@ class BayesianOptimization(HyperparameterTuning):
         
         print("\n=== Parameter search with BayesianOptimization  ...")
 
-        save_file_name = 'best_hyperparameters_source_separation.joblib'
-        if os.path.isfile(models_folder+save_file_name):
+        save_file_path = os.path.join(MODELS_FOLDER, 'best_hyperparameters_source_separation.joblib')
+        if os.path.isfile(save_file_path):
             print("\n=== Loading existing parameters ...")
-            best_hyperparameters = joblib.load(models_folder+save_file_name)
+            best_hyperparameters = joblib.load(save_file_path)
             print("\n--- best_hyperparameters", best_hyperparameters)
             return best_hyperparameters
 
@@ -177,9 +179,9 @@ class BayesianOptimization(HyperparameterTuning):
         # Print the values of the best parameters
         print("\n--- best_hyperparameters", best_hyperparameters)
         
-        if not os.path.exists(models_folder):
-            os.makedirs(models_folder)
-        joblib.dump(best_hyperparameters, models_folder+save_file_name)
+        if not os.path.exists(MODELS_FOLDER):
+            os.makedirs(MODELS_FOLDER)
+        joblib.dump(best_hyperparameters, save_file_path)
 
         return best_hyperparameters
 
@@ -215,22 +217,21 @@ def plot_precision_recall_curve(y_test, probas_, isValidation=False):
     plt.legend()
     plt.tight_layout()
 
-    results_folder = 'results/'
-    if not os.path.exists(results_folder):
-        os.makedirs(results_folder)
+    if not os.path.exists(RESULTS_FOLDER):
+        os.makedirs(RESULTS_FOLDER)
     if isValidation == False:
-        plt.savefig(results_folder + 'precision_recall_curve_source_separation.pdf')
-        plt.savefig(results_folder + 'precision_recall_curve_source_separation.png')
+        plt.savefig(RESULTS_FOLDER + 'precision_recall_curve_source_separation.pdf')
+        plt.savefig(RESULTS_FOLDER + 'precision_recall_curve_source_separation.png')
     else:
-        plt.savefig(results_folder + 'precision_recall_curve_source_separation_validation.pdf')
-        plt.savefig(results_folder + 'precision_recall_curve_source_separation_validation.png')
+        plt.savefig(RESULTS_FOLDER + 'precision_recall_curve_source_separation_validation.pdf')
+        plt.savefig(RESULTS_FOLDER + 'precision_recall_curve_source_separation_validation.png')
 
 
 def plot_precision_recall_curve_zoomin(statsFileTest, model_save_file, results_file):
-    
-    if os.path.isfile(model_save_file):
+    model_save_path = os.path.join(MODELS_FOLDER, model_save_file)
+    if os.path.isfile(model_save_path):
         print("Gathering trained model ...")
-        model = joblib.load(model_save_file)
+        model = joblib.load(model_save_path)
     else:
         print("You have to train source separation's model first!")
         print("Exiting ...")
@@ -276,11 +277,10 @@ def plot_precision_recall_curve_zoomin(statsFileTest, model_save_file, results_f
     plt.draw()
     plt.tight_layout()
 
-    results_folder = 'results/'
-    if not os.path.exists(results_folder):
-        os.makedirs(results_folder)
-    plt.savefig(results_folder + '{}.pdf'.format(results_file))
-    plt.savefig(results_folder + '{}.png'.format(results_file))
+    if not os.path.exists(RESULTS_FOLDER):
+        os.makedirs(RESULTS_FOLDER)
+    plt.savefig(RESULTS_FOLDER + '{}.pdf'.format(results_file))
+    plt.savefig(RESULTS_FOLDER + '{}.png'.format(results_file))
 
 def gather_dataset(statsFile):
     stats = pd.read_csv(statsFile) 
@@ -324,9 +324,10 @@ def hyperparameter_tuning(statsFileTrain, statsFileValidate, statsFileTest, algo
     hyperparameter_tuning.search_parameters()
 
 def test(statsFileTest, model_save_file):
-    if os.path.isfile(model_save_file):
+    model_save_path = os.path.join(MODELS_FOLDER, model_save_file)
+    if os.path.isfile(model_save_path):
         print("Gathering trained model ...")
-        model = joblib.load(models_folder+model_save_file)
+        model = joblib.load(model_save_path)
     else:
         print("You have to train source separation's model first!")
         print("Exiting ...")
@@ -342,10 +343,10 @@ def test(statsFileTest, model_save_file):
     return probas_
 
 def test_full_pipeline(dataset_name, statsFileTest, model_save_file, optimal_thr=True):
-
-    if os.path.isfile(model_save_file):
+    model_save_path = os.path.join(MODELS_FOLDER, model_save_file)
+    if os.path.isfile(model_save_path):
         print("Gathering trained model ...")
-        model = joblib.load(model_save_file)
+        model = joblib.load(model_save_path)
     else:
         print("You have to train source separation's model first!")
         print("Exiting ...")
@@ -388,5 +389,25 @@ def dump_pipeline_features(dataset_name, features, predictions, captures, decisi
     features_folder = 'full_pipeline_features/'
     if not os.path.exists(features_folder):
         os.makedirs(features_folder)
-    pickle.dump(outputClientFeatures, open(features_folder+'client_features_source_separation_thr_{}_{}.pickle'.format(decision_threshold, dataset_name), 'wb'))
-    pickle.dump(outputOSFeatures, open(features_folder+'os_features_source_separation_thr_{}_{}.pickle'.format(decision_threshold, dataset_name), 'wb'))
+    pickle.dump(outputClientFeatures, open(os.path.join(features_folder, f'client_features_source_separation_thr_{decision_threshold}_{decision_threshold}.pickle'), 'wb'))
+    pickle.dump(outputOSFeatures, open(os.path.join(features_folder, f'os_features_source_separation_thr_{decision_threshold}_{dataset_name}.pickle'), 'wb'))
+
+def top10_features(statsFileTest: str, model_save_file: str) -> list[str]:
+    model_save_path = os.path.join(MODELS_FOLDER, model_save_file)
+    if os.path.isfile(model_save_path):
+        print("Gathering trained model ...")
+        model = joblib.load(model_save_path)
+    else:
+        print("You have to train source separation's model first!")
+        print("Exiting ...")
+        exit()
+
+    X_test, _, _ = gather_dataset(statsFileTest)
+    
+    feat_importances = pd.Series(model.feature_importances_, index=X_test.columns)
+    feat_importances.nlargest(10).plot(kind='barh')
+    plt.savefig(f'{RESULTS_FOLDER}feat_importances_source_separation.png', bbox_inches='tight')
+    plt.savefig(f'{RESULTS_FOLDER}feat_importances_source_separation.pdf', bbox_inches='tight')
+    
+    print(feat_importances.nlargest(10).index)
+    return feat_importances.nlargest(10).index
