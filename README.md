@@ -3,7 +3,8 @@
 This repository presents the code for the artefact evaluation for The Network and Distributed System Security Symposium (NDSS) 2024.
 
 ## Artifact Evaluation
-Repository: [![DOI](https://zenodo.org/badge/693254187.svg)](https://zenodo.org/badge/latestdoi/693254187)
+Repository: [![DOI](https://zenodo.org/badge/693254187.svg)](https://zenodo.org/doi/10.5281/zenodo.8393157) 
+
 
 We make available a set of scripts to run all the experiments that reproduce the main results of the paper. The whole set of experiments can be executed by running:
 ```
