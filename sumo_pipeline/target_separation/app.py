@@ -22,7 +22,7 @@ def train(stats_file_train: str, model_save_file: str) -> None:
     classifier.train(stats_file_train, model_save_file)
 
 @app.command()
-def validate(stats_file_train: str, 
+def hyperparameter_tuning(stats_file_train: str, 
              stats_file_validate: str, 
              stats_file_test: str) -> None:
     """

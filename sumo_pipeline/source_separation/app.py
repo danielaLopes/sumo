@@ -22,9 +22,9 @@ def train(stats_file_train: str, model_save_file: str) -> None:
     classifier.train(stats_file_train, model_save_file)
 
 @app.command()
-def validate(stats_file_train: str, 
-             stats_file_validate: str, 
-             stats_file_test: str) -> None:
+def hyperparameter_tuning(stats_file_train: str, 
+                        stats_file_validate: str, 
+                        stats_file_test: str) -> None:
     """
     Tune source separation hyperparameters using bayesian optimization.
 
@@ -37,7 +37,10 @@ def validate(stats_file_train: str,
         $ python3 app.py hyperparameter-tuning /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSTrain/stats_source_separation.csv /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSValidate/stats_source_separation.csv /mnt/nas-shared/torpedo/extracted_features/extracted_features_OSTest/stats_source_separation.csv
     """
     typer.echo("Hyperparameter tuning ...")
-    classifier.hyperparameter_tuning(stats_file_train, stats_file_validate, stats_file_test, algorithm='BayesianOptimization')
+    classifier.hyperparameter_tuning(stats_file_train, 
+                                     stats_file_validate, 
+                                     stats_file_test, 
+                                     algorithm='BayesianOptimization')
 
 @app.command()
 def test_standalone(stats_file_test: str, 

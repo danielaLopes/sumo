@@ -9,7 +9,7 @@ import pickle
 import sys
 import math
 
-import query_sumo_dataset
+import sumo_pipeline.extract_raw_pcap_features.query_sumo_dataset as query_sumo_dataset
 
 
 np.set_printoptions(threshold=sys.maxsize)

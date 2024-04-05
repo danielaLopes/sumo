@@ -6,7 +6,6 @@ os.environ['NUMEXPR_MAX_THREADS'] = str(multiprocessing.cpu_count())
 
 import sliding_subset_sum
 import results_plot_maker
-import extract_pair_features
 from constants import *
 
 
@@ -55,25 +54,6 @@ def __get_instance(dataset_name: str) -> sliding_subset_sum.SlidingSubsetSum:
 
 app = typer.Typer()
 
-
-@app.command()
-def extract_pairs_features(dataset_folder: str, dataset_name: str, timeSamplingInterval: int):
-    """
-    Goes through every client-side flow features (packets and timings) and groups it with all
-    all onion-side flow features overlapping in time.
-
-    Args:
-        dataset_folder (str): The path to the testing features.
-        dataset_name (str): The name that uniquely identifies this dataset so that we can store results.
-        timeSamplingInterval (int): The bucket size in miliseconds. If timeSamplingInterval==500, then we will 
-                                    create an histogram where each bucket gets the count of packets seen
-                                    every 500 ms.
-
-    Example:
-        $ python3 app.py extract-pairs-features /mnt/nas-shared/torpedo/extracted_features_OSTest/ OSTest 500
-    """
-    typer.echo("Extracting pairs features ...")
-    extract_pair_features.extract_pairs_features(dataset_folder, dataset_name, timeSamplingInterval)
 
 @app.command()
 def correlate_sessions(dataset_name: str):

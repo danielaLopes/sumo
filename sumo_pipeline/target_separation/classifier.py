@@ -53,7 +53,10 @@ def store_model(model, X_train, save_file_name):
 
 class HyperparameterTuning:
 
-    def __init__(self, plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, stats_file_test):
+    def __init__(self, 
+                 statsFileTrain: str, 
+                 statsFileValidate: str, 
+                 stats_file_test: str):
         print("\n=== Gathering training dataset ...")
         self.X_train, self.y_train = gather_dataset(statsFileTrain)
         print("\n=== Gathering validation dataset ...")

@@ -1,4 +1,4 @@
-import query_sumo_dataset
+import sumo_pipeline.extract_raw_pcap_features.query_sumo_dataset as query_sumo_dataset
 import results_plot_maker
 
 

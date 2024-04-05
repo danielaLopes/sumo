@@ -4,7 +4,7 @@ import traceback
 from scapy.all import *
 import numpy as np
 
-import sumo_features
+import sumo_pipeline.extract_raw_pcap_features.sumo_features as sumo_features
 
 
 def getConcurrencyOverlapPercentage(request_id, initialTimestamp1, initialTimestamp2, lastTimestamp1, lastTimestamp2, concurrentRequests, osCapture1, osCapture2):

@@ -7,3 +7,5 @@ sudo apt install python3 ocl-icd-opencl-dev opencl-headers make g++ python3-matp
 echo "Installing python requirements ..."
 python3 -m pip install -r requirements.txt
 
+pip3 install -e .
+

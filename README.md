@@ -2,6 +2,17 @@
 
 This repository presents the code for the artefact evaluation for The Network and Distributed System Security Symposium (NDSS) 2024.
 
+* **Paper available at:** [https://www.ndss-symposium.org/wp-content/uploads/2024-337-paper.pdf](https://www.ndss-symposium.org/wp-content/uploads/2024-337-paper.pdf)
+
+* **Presentation at NDSS'24:** [Presentation pdf](./f0337-lopes.pdf)
+
+
+# If you make use of our work please cite our NDSS'24 paper:
+
+"Flow Correlation Attacks on Tor Onion Service Sessions with Sliding Subset Sum". Daniela Lopes, Jin-Dong Dong, Daniel Castro, Pedro Medeiros, Diogo Barradas, Bernardo Portela, João Vinagre, Bernardo Ferreira, Nicolas Christin, and Nuno Santos. The Network and Distributed System Security Symposium (NDSS) 2024.
+
+
+
 ## Artifact Evaluation
 Repository: [![DOI](https://zenodo.org/badge/693254187.svg)](https://zenodo.org/doi/10.5281/zenodo.8393157) 
 
@@ -116,15 +127,61 @@ The DeepCoFFEA models trained with SUMos data are available at:
 To collect the latency/throughput metrics of SUMo follow the instructions in (experience5.sh)[./experiment4.sh]. It should output a plot in `experiment4/plot_subsetsum2d.pdf` with the latency/throughput curve of our solution. The script also prints the point with maximum throughput.
 
 
+## Additional functionality
+Besides the previous sections for the Arfifact Evaluation, we also made available other resources used for the paper.
+
+
+### Generating datasets composed of actual Tor traffic
+
+
+
+
+
+### Extracting features from the raw .pcaps
+We made the features for the filtering phase available online to allow not having the raw .pcaps datasets that are over 50 GB to run the pipeline. However, this step is required to run the SUMo pipeline, and in can be done in the following way:
+```
+cd sumo_pipeline/extract_raw_pcap_features/
+python3 app.py [DATA_FOLDER] [DATASET_NAME]
+```
+
+We used the scapy Python library to extract packet data from the raw .pcap files.
+
+
+### Hyperparameter tuning
+#### Source separation
+```
+cd sumo_pipeline/source_separation
+python app.py hyperparameter-tuning [STATS_FILE_TRAIN] [STATS_FILE_VALIDATE] [STATS_FILE_TEST]
+```
+
+
+#### Target separation
+```
+cd sumo_pipeline/target_separation
+python app.py hyperparameter-tuning [STATS_FILE_TRAIN] [STATS_FILE_VALIDATE] [STATS_FILE_TEST]
+```
+
+
+#### Correlation
+```
+cd sumo_pipeline/session_correlation
+python app.py hyperparameter-tuning [DATASET_FOLDER_VALIDATE] [DATASET_FOLDER_TEST]
+```
+
+
+
 ### Guard coverage
-#### Study Tor relays in client circuit
-```
-cd guard_coverage
-```
+To study the feasibility of correlation attacks on the Tor network for circuits with onion services, we conducted the two following studies:
+1. **Client-side guard probability:** Establish 3-hop circuits and gather the guard probabilities by country, by AS, and by ISP.
+    * Generate circuits script: tor_client_stem.ipynb
+        * This will generate ./results/data/client_guard_nodes.joblib, client_middle_nodes.joblib, and ./results/data/client_exit_nodes.joblib
+    * Script to plot client-side guard coverage per ISP, per AS and per country: tor_guard_probabilities_client_only.ipynb
+2. **Probability of onion service circuit being deanonymized:** We consider the deanonymization probability as the probability of both guard nodes of a circuit between a client and an onion service of being on the same country, AS, ISP, or group of colluding countries, ASes, or ISPs. For this, we establish circuits between our and our onion services and gather the probability that both guard nodes are within the same AS or the same country. 
+    * Generate circuits script: client_onion_service_sessions.ipynb
+    * Plot script: tor_guard_probabilities_client_onion_session.ipynb
 
-* Execute tor_client_stem.ipynb to obtain ./results/data/client_guard_nodes.joblib, client_middle_nodes.joblib, ./results/data/client_exit_nodes.joblib
+We used stem Python library and Tor version 0.4.7.14 for both experiments.
 
-* Plot client-side guard coverage per ISP, per AS and per country by executing plot_guard_probabilities_client_only.ipynb
 
 
 # If you make use of our work please cite our NDSS'24 paper:

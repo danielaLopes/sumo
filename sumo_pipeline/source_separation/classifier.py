@@ -55,14 +55,14 @@ def store_model(model, X_train, save_file_name):
 # TODO: Test hyperparameter tuning
 class HyperparameterTuning:
 
-    def __init__(self, plFileTrain, statsFileTrain, plFileValidate, statsFileValidate, plFileTest, statsFileTest):
+    def __init__(self, statsFileTrain, statsFileValidate, statsFileTest):
         print("\n=== Gathering training dataset ...")
-        self.X_train, self.y_train, _ = gather_dataset(plFileTrain, statsFileTrain)
+        self.X_train, self.y_train, _ = gather_dataset(statsFileTrain)
         print("self.X_train", self.X_train)
         print("\n=== Gathering validation dataset ...")
-        self.X_validate, self.y_validate, _ = gather_dataset(plFileValidate, statsFileValidate)
+        self.X_validate, self.y_validate, _ = gather_dataset(statsFileValidate)
         print("\n=== Gathering testing dataset ...")
-        self.X_test, self.y_test, _ = gather_dataset(plFileTest, statsFileTest)
+        self.X_test, self.y_test, _ = gather_dataset(pstatsFileTest)
 
     def search_method(self):
         pass
@@ -318,7 +318,10 @@ def train(statsFileTrain, model_save_file):
 
     store_model(model, X_train, model_save_file)
 
-def hyperparameter_tuning(statsFileTrain, statsFileValidate, statsFileTest, algorithm='BayesianOptimization'):
+def hyperparameter_tuning(statsFileTrain: str, 
+                          statsFileValidate: str, 
+                          statsFileTest: str, 
+                          algorithm: str='BayesianOptimization'):
     if algorithm == 'BayesianOptimization':
         hyperparameter_tuning = BayesianOptimization(statsFileTrain, statsFileValidate, statsFileTest)
     hyperparameter_tuning.search_parameters()

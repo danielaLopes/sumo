@@ -32,3 +32,5 @@
 *models/
 *full_pipeline_features/
 *datasets/
+
+*egg-info/

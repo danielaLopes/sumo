@@ -10,7 +10,7 @@ import math
 import glob
 import os
 
-import query_sumo_dataset
+import sumo_pipeline.extract_raw_pcap_features.query_sumo_dataset as query_sumo_dataset
 from constants import *
 
 
@@ -394,10 +394,63 @@ def precision_recall_curve_with_threshold_multiple_session_durations(figures_res
     plt.xticks(rotation=45)
     #fig.tight_layout()
 
-    #plt.savefig('{}precision_recall_curve_with_threshold_multiple_session_durations_{}.png'.format(figures_results_folder, dataset_name), bbox_inches='tight')
-    #plt.savefig('{}precision_recall_curve_with_threshold_multiple_session_durations_{}.pdf'.format(figures_results_folder, dataset_name), bbox_inches='tight')
-    plt.savefig('{}precision_recall_curve_with_threshold_multiple_session_durations_metricsMap_{}.png'.format(figures_results_folder, dataset_name), bbox_inches='tight')
-    plt.savefig('{}precision_recall_curve_with_threshold_multiple_session_durations_metricsMap_{}.pdf'.format(figures_results_folder, dataset_name), bbox_inches='tight')
+    plt.savefig('{}precision_recall_curve_with_threshold_multiple_session_durations_{}.png'.format(figures_results_folder, dataset_name), bbox_inches='tight')
+    plt.savefig('{}precision_recall_curve_with_threshold_multiple_session_durations_{}.pdf'.format(figures_results_folder, dataset_name), bbox_inches='tight')
+    #plt.savefig('{}precision_recall_curve_with_threshold_multiple_session_durations_metricsMap_{}.png'.format(figures_results_folder, dataset_name), bbox_inches='tight')
+    #plt.savefig('{}precision_recall_curve_with_threshold_multiple_session_durations_metricsMap_{}.pdf'.format(figures_results_folder, dataset_name), bbox_inches='tight')
+
+    plt.clf()
+
+
+def precision_recall_curve_with_threshold_single_session_duration(figures_results_folder, results_by_min_duration, flow_count_by_duration, dataset_name):
+    """
+    """
+
+    plt.rc('font', size=36)          # controls default text sizes
+    plt.rc('axes', titlesize=52)     # fontsize of the axes title
+    plt.rc('xtick', labelsize=42)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=42)    # fontsize of the tick labels
+    plt.rc('legend', fontsize=42)    # legend fontsize
+    plt.rc('figure', titlesize=56)  # fontsize of the figure title
+
+    plt.rcParams['figure.figsize'] = (16,8)
+    plt.rcParams['axes.xmargin'] = 0
+    plt.rcParams['axes.ymargin'] = 0
+
+    thresholds = list(results_by_min_duration.keys())
+    min_duration_flows = flow_count_by_duration[0]
+
+    fig, ax = plt.subplots()
+    x_axis_recall = []
+    y_axis_precision = []
+    for threshold in thresholds:
+        x_axis_recall.append(results_by_min_duration[threshold][0].recall)
+        y_axis_precision.append(results_by_min_duration[threshold][0].precision)
+
+    for j, (x, y) in enumerate(zip(x_axis_recall, y_axis_precision)):
+        if x == 0 and y == 0:
+            x_axis_recall[j] = float('nan')
+            y_axis_precision[j] = float('nan')
+
+    ax.plot(x_axis_recall, y_axis_precision, color='tab:blue', zorder=0, linestyle='-', marker='o', linewidth=8, markersize=28)
+
+    ax.spines['bottom'].set_linewidth(4)
+    ax.spines['left'].set_linewidth(4)
+    ax.tick_params(width=4)
+
+    ax.set_xlim(0, 1.005)
+    ax.set_ylim(0.9, 1.001)
+    ax.set_xticks(np.arange(0, 1.005, 0.1))
+    ax.set_yticks(np.arange(0.9, 1.005, 0.02))
+    ax.set_ylabel('Precision', fontsize=52)
+    ax.set_xlabel('Recall', fontsize=52)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    plt.xticks(rotation=45)
+
+    plt.savefig('{}precision_recall_curve_with_threshold_single_session_duration_{}.png'.format(figures_results_folder, dataset_name), bbox_inches='tight')
+    plt.savefig('{}precision_recall_curve_with_threshold_single_session_duration_{}.pdf'.format(figures_results_folder, dataset_name), bbox_inches='tight')
 
     plt.clf()
 
