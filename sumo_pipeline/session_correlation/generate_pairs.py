@@ -234,9 +234,7 @@ def process_features_epochs_sessions_full_pipeline(dataset_name: str,
             client_folder = client_session_id_split[1].split("-ostest-")[0]
             client_extracted_features_folder = get_extracted_features_folder(top_path, "onion", client_folder, client_session_id)
             client_file_path = f"{client_extracted_features_folder}folderDict.pickle"
-            # TODO
-            # client_folder_dict = pickle.load(open(client_file_path, 'rb'))
-            client_folder_dict = pickle.load(open(onion_file_path, 'rb'))
+            client_folder_dict = pickle.load(open(client_file_path, 'rb'))
             packet_count_in = get_bucketized_packet_count(client_folder_dict['hsFlow']['timesOutAbs'], client_folder_dict['hsMetaStats']['initialTimestamp'], client_folder_dict['hsMetaStats']['lastTimestamp'], time_sampling_interval)
             client_flows[session_id] = flows.ClientFlow(client_folder_dict['hsMetaStats']['initialTimestamp'], client_folder_dict['hsMetaStats']['lastTimestamp'], packet_count_in, client_folder_dict['hsFlow']['timesOutAbs'])
 

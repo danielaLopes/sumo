@@ -132,7 +132,9 @@ Besides the previous sections for the Arfifact Evaluation, we also made availabl
 
 
 ### Generating datasets composed of actual Tor traffic
-
+We made a functional prototype of a framework for the automated generation of real Tor traffic datasets to be used to generate datasets for testing attacks like Website Fingerprinting and Traffic Correlation.
+* **Github repository:** [https://github.com/danielaLopes/tiger_tor_traffic_generator](https://github.com/danielaLopes/tiger_tor_traffic_generator)
+* **WPES '23 Paper:** [TIGER: Tor Traffic Generator for Realistic Experiments](https://dl.acm.org/doi/pdf/10.1145/3603216.3624960)
 
 
 
