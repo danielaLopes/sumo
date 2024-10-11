@@ -2,7 +2,11 @@ typer==0.9.0
 matplotlib==3.7.1
 xgboost==1.7.5
 hyperopt==0.2.7
+numpy==1.26.4
+joblib
+siphash24
 pyopencl
+ansible
 dill==0.3.6
 dpkt
 scapy==2.5.0
