@@ -119,7 +119,7 @@ The SUMo features converted to the DeepCoFFEA format are available at:
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8386335.svg)](https://zenodo.org/record/8386335/files/sumo_features_for_deepcoffea.tar.gz)
 
 The DeepCoFFEA models trained with SUMos data are available at:
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8388196.svg)](https://zenodo.org/record/8386335/files/deepcoffea_models.tar.gz)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8388196.svg)](https://zenodo.org/records/8388196/files/deepcoffea_models.tar.gz)
 
 
 ### Throughput/latency
