@@ -86,7 +86,8 @@ The datasets are also available from:
 ## Run SUMo
 
 ### Filtering phase
-The pre-trained models used to take the paper results are available in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8369700.svg)](https://zenodo.org/record/8369700/files/extracted_features.tar.gz)
+The pre-trained models used to take the paper results are available in [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8366377.svg)](https://zenodo.org/records/8366378/files/models.tar.gz)
+
 
 #### Source separation
 ```
